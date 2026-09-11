@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Laporan Posyandu{% endblock %}
+{% block page_title %}Pelaporan & Integrasi Data Posyandu{% endblock %}
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-4">
+        <a href="{{ url_for('laporan_balita') }}" class="text-decoration-none">
+            <div class="card card-stat bg-gradient-info text-white h-100">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-baby mb-3" style="font-size: 64px; opacity: 0.6;"></i>
+                    <h4 class="mb-2"><strong>Laporan Balita</strong></h4>
+                    <p class="text-white-50 mb-3">Status Gizi BB/U, TB/U, BB/TB, Stunting, Wasting, ASI Eksklusif, Imunisasi & PMT</p>
+                    <span class="badge bg-white bg-opacity-25">WHO / Kemenkes RI <i class="bi bi-arrow-right ms-1"></i></span>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-lg-4">
+        <a href="{{ url_for('laporan_ibu_hamil') }}" class="text-decoration-none">
+            <div class="card card-stat bg-gradient-warning h-100" style="color: #333;">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-person-pregnant mb-3" style="font-size: 64px; opacity: 0.6;"></i>
+                    <h4 class="mb-2"><strong>Laporan Ibu Hamil & Nifas</strong></h4>
+                    <p class="mb-3" style="color: #6b4a00;">ANC, Risiko KEK (LILA < 23.5), Hipertensi Kehamilan, Cakupan TTD & TT</p>
+                    <span class="badge" style="background-color: rgba(0,0,0,0.15);">Puskesmas / Program KIA <i class="bi bi-arrow-right ms-1"></i></span>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-lg-4">
+        <a href="{{ url_for('laporan_lansia') }}" class="text-decoration-none">
+            <div class="card card-stat bg-gradient-success text-white h-100">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-person-heart mb-3" style="font-size: 64px; opacity: 0.6;"></i>
+                    <h4 class="mb-2"><strong>Laporan Lansia & PTM</strong></h4>
+                    <p class="text-white-50 mb-3">Hipertensi, Diabetes, Kolesterol, Asam Urat, Skrining Jiwa & Posbindu</p>
+                    <span class="badge bg-white bg-opacity-25">PTM / SATUSEHAT <i class="bi bi-arrow-right ms-1"></i></span>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+<div class="card mt-5">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="bi bi-diagram-3 me-2"></i>Alur Integrasi & Standar Interoperabilitas</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="border rounded-4 p-4 text-center">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-keyboard-fill" style="font-size: 32px;"></i>
+                    </div>
+                    <h6 class="fw-bold">Satu Kali Input di Lokasi</h6>
+                    <p class="text-muted small mb-0">Kader / Nakes input data langsung di Posyandu / Pustu, data otomatis terkumpul & siap laporan.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="border rounded-4 p-4 text-center">
+                    <div class="bg-success bg-opacity-10 text-success rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-hospital-fill" style="font-size: 32px;"></i>
+                    </div>
+                    <h6 class="fw-bold">Terakumulasi ke Puskesmas</h6>
+                    <p class="text-muted small mb-0">Data per Posyandu dikelompokkan per Puskesmas domisili, siap cetak laporan bulanan / tahunan.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="border rounded-4 p-4 text-center">
+                    <div class="bg-info bg-opacity-10 text-info rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-cloud-arrow-up-fill" style="font-size: 32px;"></i>
+                    </div>
+                    <h6 class="fw-bold">SATUSEHAT & ASIK Ready</h6>
+                    <p class="text-muted small mb-0">Format data kompatibel dengan platform SATUSEHAT & ASIK Kemenkes, dukung WhatsApp Chatbot.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

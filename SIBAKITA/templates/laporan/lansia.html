@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block title %}Laporan Lansia & PTM{% endblock %}
+{% block page_title %}Laporan Lansia & Skrining Penyakit Tidak Menular{% endblock %}
+{% block content %}
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small fw-bold">Dari Tanggal</label>
+                <input type="date" name="start" class="form-control" value="{{ start or '' }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small fw-bold">Sampai Tanggal</label>
+                <input type="date" name="end" class="form-control" value="{{ end or '' }}">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-success w-100"><i class="bi bi-filter me-1"></i>Filter</button>
+            </div>
+            <div class="col-md-2">
+                <a href="{{ url_for('laporan_lansia') }}" class="btn btn-outline-secondary w-100"><i class="bi bi-arrow-clockwise me-1"></i>Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-stat bg-gradient-success text-white">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-white-50 mb-1 text-uppercase small">Total Skrining PTM</h6>
+                    <h2 class="mb-0 fw-bold">{{ total }}</h2>
+                    <small>Kali Pemeriksaan</small>
+                </div>
+                <i class="bi bi-person-heart" style="font-size: 48px; opacity: 0.4;"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-stat bg-gradient-danger text-white">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-white-50 mb-1 text-uppercase small">Hipertensi</h6>
+                    <h2 class="mb-0 fw-bold">{{ hipertensi }}</h2>
+                    <small>TD ≥ 140/90 mmHg</small>
+                </div>
+                <i class="bi bi-heart-pulse-fill" style="font-size: 48px; opacity: 0.4;"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-stat bg-gradient-warning" style="color: #333;">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="mb-1 text-uppercase small" style="color: #8b5a00;">Diabetes Melitus</h6>
+                    <h2 class="mb-0 fw-bold">{{ diabetes }}</h2>
+                    <small>GDP ≥ 126 / GDS ≥ 200</small>
+                </div>
+                <i class="bi bi-droplet-fill" style="font-size: 48px; opacity: 0.4;"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card card-stat bg-gradient-info text-white">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-white-50 mb-1 text-uppercase small">Posbindu</h6>
+                    <h2 class="mb-0 fw-bold">100%</h2>
+                    <small>Siap Laporan Bulanan</small>
+                </div>
+                <i class="bi bi-bar-chart-line-fill" style="font-size: 48px; opacity: 0.4;"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-table text-success me-2"></i>Rekap Skrining Lansia & PTM Posyandu ({{ total }} Data)</h5>
+        <small class="text-muted"><i class="bi bi-shield-check me-1"></i>Kompatibel Laporan Posbindu PTM Puskesmas</small>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle small">
+                <thead>
+                    <tr>
+                        <th class="ps-4">Tanggal</th>
+                        <th>Nama Lansia</th>
+                        <th>BB / TB</th>
+                        <th>Tekanan Darah</th>
+                        <th>Gula Darah</th>
+                        <th>Kolesterol</th>
+                        <th>Asam Urat</th>
+                        <th>Skrining Jiwa/Indra</th>
+                        <th>Faskes</th>
+                        <th class="pe-4">Catatan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in data %}
+                    <tr>
+                        <td class="ps-4">{{ p.tanggal.strftime('%d %b %Y') }}</td>
+                        <td>
+                            <strong>{{ p.lansia.warga.nama_lengkap }}</strong><br>
+                            <small class="text-muted">{{ p.lansia.warga.jenis_kelamin }}</small>
+                        </td>
+                        <td><small>{{ p.berat_badan or '-' }} kg<br>{{ p.tinggi_badan or '-' }} cm</small></td>
+                        <td>
+                            {% if p.tekanan_darah_sistolik and p.tekanan_darah_diastolik %}
+                            <span class="{% if p.tekanan_darah_sistolik >= 140 %}text-danger fw-bold{% endif %}">
+                                {{ p.tekanan_darah_sistolik }}/{{ p.tekanan_darah_diastolik }}
+                            </span>
+                            {% else %}-{% endif %}
+                        </td>
+                        <td>
+                            {% if p.gula_darah_puasa or p.gula_darah_sewaktu %}
+                                {% if p.gula_darah_puasa %}
+                                <small>GDP: <span class="{% if p.gula_darah_puasa >= 126 %}text-danger fw-bold{% endif %}">{{ p.gula_darah_puasa }}</span></small><br>
+                                {% endif %}
+                                {% if p.gula_darah_sewaktu %}
+                                <small>GDS: <span class="{% if p.gula_darah_sewaktu >= 200 %}text-danger fw-bold{% endif %}">{{ p.gula_darah_sewaktu }}</span></small>
+                                {% endif %}
+                            {% else %}-{% endif %}
+                        </td>
+                        <td>
+                            {% if p.kolesterol %}
+                            <span class="{% if p.kolesterol >= 200 %}text-warning fw-bold{% endif %}">{{ p.kolesterol }}</span>
+                            <br><small>mg/dL</small>
+                            {% else %}-{% endif %}
+                        </td>
+                        <td>{{ p.asam_urat or '-' }}{% if p.asam_urat %} <small>mg/dL</small>{% endif %}</td>
+                        <td><small>
+                            Jiwa: <strong>{{ p.skrining_jiwa or '-' }}</strong><br>
+                            Mata: <strong>{{ p.penglihatan or '-' }}</strong><br>
+                            Telinga: <strong>{{ p.pendengaran or '-' }}</strong>
+                        </small></td>
+                        <td><small>{{ p.lansia.warga.puskesmas }}<br><strong>{{ p.lansia.warga.pustu }}</strong></small></td>
+                        <td class="pe-4"><small>{{ p.catatan or '-' }}</small></td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="10" class="text-center py-5 text-muted">
+                            <i class="bi bi-file-earmark-bar-graph" style="font-size: 48px;"></i><br>
+                            Belum ada data skrining lansia pada periode ini.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

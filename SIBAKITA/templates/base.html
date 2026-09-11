@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistem Posyandu Terintegrasi{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #0d6efd 0%, #084298 100%);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.85);
+            border-radius: 8px;
+            margin: 4px 8px;
+            padding: 10px 16px;
+            transition: all 0.2s;
+        }
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background-color: rgba(255,255,255,0.15);
+            color: #fff;
+        }
+        .sidebar .nav-link i {
+            width: 24px;
+            display: inline-block;
+        }
+        .card-stat {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+        .card-stat .card-body {
+            padding: 20px 24px;
+        }
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+        }
+        .bg-gradient-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: #fff;
+        }
+        .bg-gradient-warning {
+            background: linear-gradient(135deg, #f2994a 0%, #f2c94c 100%);
+            color: #fff;
+        }
+        .bg-gradient-info {
+            background: linear-gradient(135deg, #56CCF2 0%, #2F80ED 100%);
+            color: #fff;
+        }
+        .bg-gradient-danger {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            color: #fff;
+        }
+        .bg-gradient-purple {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #333;
+        }
+        .card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+        .card-header {
+            background-color: #fff;
+            border-bottom: 1px solid #e9ecef;
+            border-radius: 16px 16px 0 0 !important;
+            padding: 16px 24px;
+        }
+        .card-body {
+            padding: 24px;
+        }
+        .btn {
+            border-radius: 10px;
+            padding: 8px 20px;
+        }
+        .form-control, .form-select {
+            border-radius: 10px;
+            padding: 10px 14px;
+            border: 1px solid #dee2e6;
+        }
+        .form-control:focus, .form-select:focus {
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+            border-color: #86b7fe;
+        }
+        .table {
+            margin-bottom: 0;
+        }
+        .table thead th {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            font-weight: 600;
+            color: #495057;
+        }
+        .badge {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        .content-wrapper {
+            margin-left: 260px;
+            padding: 24px;
+        }
+        @media (max-width: 768px) {
+            .content-wrapper {
+                margin-left: 0;
+            }
+            .sidebar {
+                display: none;
+            }
+        }
+        .status-gizi-buruk { background-color: #ffe5e5; color: #b71c1c; }
+        .status-gizi-kurang { background-color: #fff3e0; color: #e65100; }
+        .status-gizi-normal { background-color: #e8f5e9; color: #2e7d32; }
+        .status-gizi-lebih { background-color: #e3f2fd; color: #0d47a1; }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="d-flex">
+        <nav class="sidebar position-fixed" style="width: 260px;">
+            <div class="p-4 text-white text-center border-bottom border-white-20">
+                <div class="mb-2">
+                    <i class="bi bi-heart-pulse-fill" style="font-size: 40px;"></i>
+                </div>
+                <h5 class="mb-0 fw-bold">POSYANDU</h5>
+                <small class="text-white-50">Sistem Terintegrasi</small>
+            </div>
+            <div class="nav flex-column py-3">
+                <a href="{{ url_for('dashboard') }}" class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+                <h6 class="sidebar-heading text-white-50 px-4 mt-4 mb-2" style="font-size: 0.75rem; letter-spacing: 1px;">DATA WARGA</h6>
+                <a href="{{ url_for('daftar_warga') }}" class="nav-link {% if request.endpoint == 'daftar_warga' %}active{% endif %}">
+                    <i class="bi bi-people-fill"></i> Daftar Warga
+                </a>
+                <a href="{{ url_for('tambah_warga') }}" class="nav-link {% if request.endpoint == 'tambah_warga' %}active{% endif %}">
+                    <i class="bi bi-person-plus-fill"></i> Registrasi Baru
+                </a>
+                <h6 class="sidebar-heading text-white-50 px-4 mt-4 mb-2" style="font-size: 0.75rem; letter-spacing: 1px;">PELAYANAN</h6>
+                <a href="{{ url_for('daftar_warga', kategori='Balita') }}" class="nav-link">
+                    <i class="bi bi-baby"></i> Bayi & Balita
+                </a>
+                <a href="{{ url_for('daftar_warga', kategori='Ibu Hamil') }}" class="nav-link">
+                    <i class="bi bi-person-pregnant"></i> Ibu Hamil & Nifas
+                </a>
+                <a href="{{ url_for('daftar_warga', kategori='Lansia') }}" class="nav-link">
+                    <i class="bi bi-person-heart"></i> Lansia & PTM
+                </a>
+                <h6 class="sidebar-heading text-white-50 px-4 mt-4 mb-2" style="font-size: 0.75rem; letter-spacing: 1px;">PELAPORAN</h6>
+                <a href="{{ url_for('laporan_balita') }}" class="nav-link">
+                    <i class="bi bi-bar-chart-line-fill"></i> Laporan Balita
+                </a>
+                <a href="{{ url_for('laporan_ibu_hamil') }}" class="nav-link">
+                    <i class="bi bi-bar-chart-line-fill"></i> Laporan Ibu Hamil
+                </a>
+                <a href="{{ url_for('laporan_lansia') }}" class="nav-link">
+                    <i class="bi bi-bar-chart-line-fill"></i> Laporan Lansia
+                </a>
+                <div class="mt-4 mx-3 p-3 rounded" style="background-color: rgba(255,255,255,0.1);">
+                    <small class="text-white-50 d-block mb-1"><i class="bi bi-info-circle"></i> Kompatibel dengan:</small>
+                    <small class="text-white d-block fw-bold">SATUSEHAT & ASIK</small>
+                </div>
+            </div>
+        </nav>
+        <div class="content-wrapper flex-grow-1">
+            <nav class="navbar navbar-expand-lg navbar-light bg-white rounded-16 mb-4 shadow-sm" style="border-radius: 16px;">
+                <div class="container-fluid">
+                    <span class="navbar-brand ms-2 text-primary">
+                        <i class="bi bi-chevron-right me-2"></i>{% block page_title %}Dashboard{% endblock %}
+                    </span>
+                    <div class="d-flex align-items-center">
+                        <span class="text-muted me-3 small">
+                            <i class="bi bi-calendar-event-fill"></i> {{ datetime.now().strftime('%d %B %Y') }}
+                        </span>
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="bi bi-person-badge-fill"></i>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show mb-4 rounded-16 border-0 shadow-sm" role="alert">
+                            <i class="bi bi-info-circle-fill me-2"></i>{{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
