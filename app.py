@@ -1,13 +1,27 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, abort
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, date
-import os
 from math import sqrt
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'posyandu-secret-key-2024'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///posyandu.db'
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'posyandu-secret-key-2024')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+DB_TYPE = os.getenv('DB_TYPE', 'sqlite')
+if DB_TYPE == 'mysql':
+    DB_HOST = os.getenv('DB_HOST', '127.0.0.1')
+    DB_PORT = os.getenv('DB_PORT', '3306')
+    DB_NAME = os.getenv('DB_NAME', 'sibakita')
+    DB_USER = os.getenv('DB_USER', 'root')
+    DB_PASS = os.getenv('DB_PASSWORD', '')
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}?charset=utf8mb4'
+else:
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'instance', 'posyandu.db')
 
 db = SQLAlchemy(app)
 
