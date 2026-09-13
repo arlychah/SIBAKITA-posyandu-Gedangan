@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+{% block title %}Pemeriksaan Lansia - {{ lansia.warga.nama_lengkap }}{% endblock %}
+{% block page_title %}Skrining PTM & Layanan Lansia Posyandu{% endblock %}
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-3">
+        <div class="card mb-4 bg-gradient-success text-white border-0">
+            <div class="card-body py-4 text-center">
+                <div class="bg-white bg-opacity-20 rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                    <i class="bi bi-person-heart" style="font-size: 40px;"></i>
+                </div>
+                <h5 class="mb-0">{{ lansia.warga.nama_lengkap }}</h5>
+                <small>{{ lansia.warga.nik }}</small>
+                <div class="mt-3">
+                    {% set tl = lansia.warga.tanggal_lahir %}
+                    {% set umur = (datetime.now().year - tl.year) %}
+                    <span class="badge bg-white bg-opacity-25">{{ umur }} Tahun</span>
+                    <span class="badge bg-white bg-opacity-25">{{ lansia.warga.jenis_kelamin }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-geo-alt text-success me-2"></i>Pelayanan</h6>
+            </div>
+            <div class="card-body small">
+                <p class="mb-2"><strong>Puskesmas:</strong> {{ lansia.warga.puskesmas }}</p>
+                <p class="mb-0"><strong>Posyandu Lansia / Pustu:</strong> {{ lansia.warga.pustu }}</p>
+            </div>
+        </div>
+        <a href="{{ url_for('detail_warga', id=lansia.warga.id) }}" class="btn btn-outline-secondary w-100 mb-3">
+            <i class="bi bi-arrow-left me-2"></i>Kembali ke Detail
+        </a>
+    </div>
+    <div class="col-lg-9">
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white border-0">
+                <div class="d-flex align-items-center">
+                    <div class="bg-white bg-opacity-20 rounded-3 p-2 me-3">
+                        <i class="bi bi-clipboard2-heart-fill" style="font-size: 20px;"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0">Form Skrining Penyakit Tidak Menular (PTM)</h5>
+                        <small class="text-white-50">Posyandu Lansia: Hipertensi, Diabetes, Kolesterol, Skrining Jiwa & Indra</small>
+                    </div>
+                </div>
+            </div>
+            <form method="post">
+                <div class="card-body">
+                    <div class="card mb-4 border">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0 text-success"><i class="bi bi-calendar-week me-2"></i>Identitas & Antropometri Dasar</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold">Tanggal Pemeriksaan</label>
+                                    <input type="date" name="tanggal" class="form-control" value="{{ datetime.now().strftime('%Y-%m-%d') }}">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold">Berat Badan (kg)</label>
+                                    <input type="number" step="0.1" name="berat_badan" class="form-control" placeholder="contoh: 60.5">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold">Tinggi Badan (cm)</label>
+                                    <input type="number" step="0.1" name="tinggi_badan" class="form-control" placeholder="contoh: 160">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card mb-4 border">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0 text-success"><i class="bi bi-heart-pulse me-2"></i>Skrining Tanda Vital & Laboratorium Dasar</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold">TD Sistolik</label>
+                                    <input type="number" name="tekanan_darah_sistolik" class="form-control" placeholder="120">
+                                    <small class="text-danger">Hipertensi ≥ 140 mmHg</small>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold">TD Diastolik</label>
+                                    <input type="number" name="tekanan_darah_diastolik" class="form-control" placeholder="80">
+                                    <small class="text-muted">mmHg normal < 90</small>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold">Gula Darah Puasa (mg/dL)</label>
+                                    <input type="number" step="0.1" name="gula_darah_puasa" class="form-control" placeholder="contoh: 95">
+                                    <small class="text-danger">Diabetes ≥ 126</small>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold">Gula Darah Sewaktu (mg/dL)</label>
+                                    <input type="number" step="0.1" name="gula_darah_sewaktu" class="form-control" placeholder="contoh: 110">
+                                    <small class="text-danger">≥ 200 Diabetes</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Kolesterol Total (mg/dL)</label>
+                                    <input type="number" step="0.1" name="kolesterol" class="form-control" placeholder="contoh: 180">
+                                    <small class="text-danger">Tinggi ≥ 200</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Asam Urat (mg/dL)</label>
+                                    <input type="number" step="0.1" name="asam_urat" class="form-control" placeholder="contoh: 6.0">
+                                    <small class="text-muted">Normal: P ≤ 6 / W ≤ 7</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card mb-4 border">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0 text-success"><i class="bi bi-eye me-2"></i>Skrining Kesehatan Jiwa, Penglihatan & Pendengaran</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold">Skrining Jiwa (GDS-15 / MMSE)</label>
+                                    <select name="skrining_jiwa" class="form-select">
+                                        <option value="">-- Hasil --</option>
+                                        <option>Normal (Tidak Ada Gangguan)</option>
+                                        <option>Gejala Depresi Ringan</option>
+                                        <option>Gejala Depresi (Dirujuk)</option>
+                                        <option>Gangguan Kognitif Ringan</option>
+                                        <option>Suspek Demensia (Dirujuk)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold">Tes Penglihatan (Visus)</label>
+                                    <select name="penglihatan" class="form-select">
+                                        <option value="">-- Pilih --</option>
+                                        <option>Normal (6/6 Snellen)</option>
+                                        <option>Berkurang Ringan (6/9 - 6/12)</option>
+                                        <option>Berkurang Berat (6/18 - 6/60)</option>
+                                        <option>Low Vision / Katarak (Dirujuk)</option>
+                                        <option>Buta / Kebutaan</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold">Tes Pendengaran (Whisper Test)</label>
+                                    <select name="pendengaran" class="form-select">
+                                        <option value="">-- Pilih --</option>
+                                        <option>Normal (Dengar Bisikan)</option>
+                                        <option>Ringan (Sulit Bisikan, OK Suara Biasa)</option>
+                                        <option>Sedang (Perlu Mengulang)</option>
+                                        <option>Berat (Sering Salah Dengar) - Dirujuk</option>
+                                        <option>Tuli</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label fw-bold">Catatan Kader / Rujukan / Obat</label>
+                                    <textarea name="catatan" rows="2" class="form-control" placeholder="Konseling diet rendah garam, obat anti-hipertensi, rujuk Pustu/Puskesmas dst."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="alert alert-success border-0">
+                        <i class="bi bi-info-circle me-2"></i><strong>Satu Kali Input, Terintegrasi Puskesmas.</strong> Data siap digabungkan ke laporan bulanan PTM & Posbindu.
+                    </div>
+                </div>
+                <div class="card-footer bg-light border-0 d-flex justify-content-end gap-2">
+                    <button type="reset" class="btn btn-outline-secondary px-4">Reset</button>
+                    <button type="submit" class="btn btn-success text-white px-5 fw-bold">
+                        <i class="bi bi-save-fill me-2"></i>Simpan Skrining PTM
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-clock-history text-success me-2"></i>Riwayat Skrining & Pemeriksaan</h5>
+                <span class="badge bg-success">{{ riwayat|length }} Data</span>
+            </div>
+            <div class="card-body p-0">
+                {% if riwayat %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th class="ps-4">Tanggal</th>
+                                <th>Tekanan Darah</th>
+                                <th>Gula Darah</th>
+                                <th>Kolesterol</th>
+                                <th>Asam Urat</th>
+                                <th class="pe-4">Skrining</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in riwayat %}
+                            <tr>
+                                <td class="ps-4"><strong>{{ p.tanggal.strftime('%d %b %Y') }}</strong></td>
+                                <td>
+                                    {% if p.tekanan_darah_sistolik and p.tekanan_darah_diastolik %}
+                                    <span class="{% if p.tekanan_darah_sistolik >= 140 %}text-danger fw-bold{% endif %}">
+                                        {{ p.tekanan_darah_sistolik }}/{{ p.tekanan_darah_diastolik }}
+                                    </span>
+                                    {% else %}-{% endif %}
+                                </td>
+                                <td>
+                                    {% if p.gula_darah_puasa or p.gula_darah_sewaktu %}
+                                        {% if p.gula_darah_puasa %}
+                                        Puasa: <span class="{% if p.gula_darah_puasa >= 126 %}text-danger fw-bold{% endif %}">{{ p.gula_darah_puasa }}</span><br>
+                                        {% endif %}
+                                        {% if p.gula_darah_sewaktu %}
+                                        Sewaktu: <span class="{% if p.gula_darah_sewaktu >= 200 %}text-danger fw-bold{% endif %}">{{ p.gula_darah_sewaktu }}</span>
+                                        {% endif %}
+                                    {% else %}-{% endif %}
+                                </td>
+                                <td>
+                                    {% if p.kolesterol %}
+                                    <span class="{% if p.kolesterol >= 200 %}text-danger fw-bold{% endif %}">{{ p.kolesterol }}</span>
+                                    <br><small>mg/dL</small>
+                                    {% else %}-{% endif %}
+                                </td>
+                                <td>{{ p.asam_urat or '-' }}{% if p.asam_urat %} <small>mg/dL</small>{% endif %}</td>
+                                <td class="pe-4 small">
+                                    {% if p.skrining_jiwa %}<span class="badge bg-secondary">{{ p.skrining_jiwa }}</span>{% endif %}<br>
+                                    <small>Mata: {{ p.penglihatan or '-' }}</small><br>
+                                    <small>Telinga: {{ p.pendengaran or '-' }}</small>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-inbox" style="font-size: 48px;"></i><br>
+                    Belum ada riwayat. Isi form di atas untuk memulai skrining.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
