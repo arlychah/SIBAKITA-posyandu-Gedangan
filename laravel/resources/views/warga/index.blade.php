@@ -1,0 +1,166 @@
+@extends('layouts.app')
+@section('title','Daftar Warga - Sistem Posyandu')
+@section('page_title', 'Daftar Warga')
+@section('content')
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label small fw-bold">Filter Kategori</label>
+                <select name="kategori" class="form-select">
+                    <option value="">Semua Kategori</option>
+                    <option value="Balita" @if($kategori == 'Balita')selected @endif>Bayi & Balita</option>
+                    <option value="Ibu Hamil" @if($kategori == 'Ibu Hamil')selected @endif>Ibu Hamil & Nifas</option>
+                    <option value="Lansia" @if($kategori == 'Lansia')selected @endif>Lansia & PTM</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label small fw-bold">Cari Nama / NIK</label>
+                <div class="input-group">
+                    <input type="text" name="search" class="form-control" placeholder="Ketik nama atau NIK..." value="{{ request('search') }}">
+                    <button class="btn btn-outline-primary" type="submit"><i class="bi bi-search me-1"></i>Cari</button>
+                </div>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <a href="{{ url('/warga/tambah') }}" class="btn btn-primary w-100">
+                    <i class="bi bi-person-plus-fill me-2"></i>Tambah Warga Baru
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-people-fill text-primary me-2"></i>Data Warga ({{ count($warga_list) }} orang)</h5>
+        <div class="d-flex gap-2">
+            <span class="badge bg-info"><i class="bi bi-baby me-1"></i>Balita</span>
+            <span class="badge bg-warning text-dark"><i class="bi bi-person-pregnant me-1"></i>Ibu Hamil</span>
+            <span class="badge bg-success"><i class="bi bi-person-heart me-1"></i>Lansia</span>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th class="ps-4">NIK</th>
+                        <th>Nama Lengkap</th>
+                        <th>JK / Usia</th>
+                        <th>Kategori</th>
+                        <th>WhatsApp</th>
+                        <th>Puskesmas / Pustu</th>
+                        <th class="pe-4 text-end">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($warga_list as $w)
+                    <tr>
+                        <td class="ps-4"><code class="text-muted">{{ $w->nik }}</code></td>
+                        <td>
+                            <strong>{{ $w->nama_lengkap }}</strong><br>
+                            <small class="text-muted"><i class="bi bi-geo-alt me-1"></i>{{ $w->alamat ?? '-' }}</small>
+                        </td>
+                        <td>
+                            <span class="badge @if($w->jenis_kelamin == 'Laki-laki')bg-primary @else bg-info @endif">
+                                {{ $w->jenis_kelamin }}
+                            </span>
+                            <div class="small mt-1">
+                                {{ $w->umur_formatted }}
+                            </div>
+                        </td>
+                        <td>
+                            @if($w->kategori == 'Balita')
+                            <span class="badge bg-info text-white"><i class="bi bi-baby me-1"></i>Balita</span>
+                            @elseif($w->kategori == 'Ibu Hamil')
+                            <span class="badge bg-warning text-dark"><i class="bi bi-person-pregnant me-1"></i>Ibu Hamil</span>
+                            @elseif($w->kategori == 'Lansia')
+                            <span class="badge bg-success"><i class="bi bi-person-heart me-1"></i>Lansia</span>
+                            @else
+                            <span class="badge bg-secondary">{{ $w->kategori }}</span>
+                            @endif
+                        </td>
+                        <td>
+                            <a href="https://wa.me/{{ $w->whatsapp }}" target="_blank" class="text-success text-decoration-none">
+                                <i class="bi bi-whatsapp me-1"></i>{{ $w->whatsapp }}
+                            </a>
+                        </td>
+                        <td>
+                            <small>
+                                <strong><i class="bi bi-hospital me-1"></i>{{ $w->puskesmas }}</strong><br>
+                                <i class="bi bi-geo-alt me-1"></i>{{ $w->pustu }}
+                            </small>
+                        </td>
+                        <td class="pe-4 text-end">
+                            <div class="btn-group">
+                                <a href="{{ url('/warga/'.$w->id) }}" class="btn btn-sm btn-outline-primary" title="Detail">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{{ url('/warga/'.$w->id.'/edit') }}" class="btn btn-sm btn-outline-secondary" title="Edit">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDelete({{ $w->id }})" title="Hapus">
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
+                            </div>
+                            @if($kategori == 'Balita' && $w->balita)
+                                <a href="{{ url('/balita/periksa/'.$w->balita->id) }}" class="btn btn-sm btn-info text-white ms-1" title="Periksa Balita">
+                                    <i class="bi bi-thermometer-half"></i>
+                                </a>
+                            @elseif($kategori == 'Ibu Hamil' && $w->ibu_hamil)
+                                <a href="{{ url('/ibu_hamil/periksa/'.$w->ibu_hamil->id) }}" class="btn btn-sm btn-warning text-dark ms-1" title="Periksa Ibu">
+                                    <i class="bi bi-thermometer-half"></i>
+                                </a>
+                            @elseif($kategori == 'Lansia' && $w->lansia)
+                                <a href="{{ url('/lansia/periksa/'.$w->lansia->id) }}" class="btn btn-sm btn-success text-white ms-1" title="Periksa Lansia">
+                                    <i class="bi bi-thermometer-half"></i>
+                                </a>
+                            @endif
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-people" style="font-size: 64px; opacity: 0.3;"></i><br>
+                            <h5 class="mt-3">Tidak ada data warga</h5>
+                            <p class="mb-4">Silakan tambahkan data warga terlebih dahulu.</p>
+                            <a href="{{ url('/warga/tambah') }}" class="btn btn-primary">
+                                <i class="bi bi-person-plus-fill me-2"></i>Tambah Warga
+                            </a>
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4">
+            <div class="modal-body text-center py-5">
+                <div class="bg-danger bg-opacity-10 text-danger rounded-circle d-flex align-items-center justify-content-center mx-auto mb-4" style="width: 80px; height: 80px;">
+                    <i class="bi bi-exclamation-triangle-fill" style="font-size: 40px;"></i>
+                </div>
+                <h5>Hapus Data Warga?</h5>
+                <p class="text-muted">Data warga dan seluruh riwayat pemeriksaannya akan dihapus permanen dan tidak dapat dikembalikan.</p>
+                <form id="deleteForm" method="post" class="d-flex gap-3 justify-content-center mt-4">
+                    @csrf
+                    <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-danger px-4"><i class="bi bi-trash-fill me-2"></i>Ya, Hapus</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+@push('extra_js')
+<script>
+const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+function confirmDelete(id) {
+    document.getElementById('deleteForm').action = '/warga/' + id + '/hapus';
+    deleteModal.show();
+}
+</script>
+@endpush
