@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('pemeriksaan_lansia', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('lansia_id');
+            $table->foreignId('lansia_id')->constrained('lansia')->cascadeOnDelete();
             $table->date('tanggal');
             $table->float('berat_badan')->nullable();
             $table->float('tinggi_badan')->nullable();
@@ -25,8 +25,6 @@ return new class extends Migration
             $table->string('pendengaran', 100)->nullable();
             $table->text('catatan')->nullable();
             $table->timestamps();
-
-            $table->foreign('lansia_id')->references('id')->on('lansia')->onDelete('cascade');
         });
     }
 

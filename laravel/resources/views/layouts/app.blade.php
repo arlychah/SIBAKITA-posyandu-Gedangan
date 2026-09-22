@@ -190,21 +190,44 @@
                         <i class="bi bi-person-heart"></i> Laporan Lansia
                     </a>
                 </div>
-                <div class="mt-4 mx-3 p-3 rounded" style="background-color: rgba(255,255,255,0.1);">
+                <div class="mx-3 mt-4 p-3 rounded-3" style="background: rgba(255,255,255,0.10); backdrop-filter: blur(6px);">
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center me-2 shadow-sm" style="width: 38px; height: 38px;">
+                            <i class="bi bi-person-fill fs-6"></i>
+                        </div>
+                        <div class="flex-grow-1 overflow-hidden">
+                            <div class="text-white fw-semibold small text-truncate">{{ Auth::user()->name ?? 'Tamu' }}</div>
+                            <div class="text-white-50 small text-truncate" style="font-size: 11px;">
+                                @php
+                                    $role = Auth::user()->role ?? 'pengunjung';
+                                    $roleMap = ['admin' => 'Administrator', 'kader' => 'Kader Posyandu', 'pengunjung' => 'Warga/Pengunjung'];
+                                    echo $roleMap[$role] ?? ucfirst($role);
+                                @endphp
+                            </div>
+                        </div>
+                    </div>
+                    <form method="POST" action="{{ route('logout') }}" class="d-grid">
+                        @csrf
+                        <button type="submit" class="btn btn-sm text-white fw-semibold py-2" style="background: rgba(239, 68, 68, 0.85); border-radius: 10px; transition: all 0.2s;" onmouseover="this.style.background='rgba(220,38,38,0.95)'" onmouseout="this.style.background='rgba(239,68,68,0.85)'">
+                            <i class="bi bi-box-arrow-right me-1"></i> Keluar
+                        </button>
+                    </form>
+                </div>
+                <div class="mx-3 mt-3 mb-4 p-3 rounded-3" style="background-color: rgba(255,255,255,0.08);">
                     <small class="text-white-50 d-block mb-1"><i class="bi bi-info-circle"></i> Kompatibel dengan:</small>
                     <small class="text-white d-block fw-bold">SATUSEHAT & ASIK</small>
                 </div>
             </div>
         </nav>
         <main class="main-content flex-grow-1">
-            <div class="d-flex justify-content-between align-items-center mb-4" style="padding-top: 16px;">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2" style="padding-top: 16px;">
                 <div>
                     <h4 class="mb-0 text-primary">
                         <i class="bi bi-chevron-right me-2"></i>@yield('page_title', 'Dashboard')
                     </h4>
                 </div>
                 <div class="d-flex align-items-center">
-                    <span class="text-muted me-3 small">
+                    <span class="text-muted me-3 small d-none d-md-inline">
                         <i class="bi bi-calendar-event-fill"></i>
                         @php
                             $hari = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
@@ -213,8 +236,46 @@
                             echo $tgl;
                         @endphp
                     </span>
-                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                        <i class="bi bi-person-badge-fill"></i>
+                    <div class="dropdown">
+                        <button class="btn border-0 p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 42px; height: 42px;">
+                                <i class="bi bi-person-badge-fill"></i>
+                            </div>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 mt-2" style="min-width: 240px;">
+                            <li>
+                                <div class="px-3 py-3 border-bottom">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 44px; height: 44px;">
+                                            <i class="bi bi-person-fill fs-5"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-semibold text-dark mb-0">{{ Auth::user()->name ?? 'Tamu' }}</div>
+                                            <small class="text-muted">{{ Auth::user()->email ?? '-' }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <span class="dropdown-item-text small text-muted px-3 py-2">
+                                    <i class="bi bi-person-gear me-2"></i>
+                                    @php
+                                        $role = Auth::user()->role ?? 'pengunjung';
+                                        $roleBadge = ['admin' => 'Administrator', 'kader' => 'Kader Posyandu', 'pengunjung' => 'Warga/Pengunjung'];
+                                        echo $roleBadge[$role] ?? ucfirst($role);
+                                    @endphp
+                                </span>
+                            </li>
+                            <li><hr class="dropdown-divider mx-3 my-1"></li>
+                            <li>
+                                <form method="POST" action="{{ route('logout') }}" class="px-3 py-2">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item text-danger rounded-2 px-3 py-2">
+                                        <i class="bi bi-box-arrow-right me-2"></i> Keluar dari Sistem
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>

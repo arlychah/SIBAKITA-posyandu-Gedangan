@@ -10,12 +10,10 @@ return new class extends Migration
     {
         Schema::create('balita', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('warga_id')->unique();
+            $table->foreignId('warga_id')->unique()->constrained('warga')->cascadeOnDelete();
             $table->string('nama_ibu', 200)->nullable();
             $table->string('nama_ayah', 200)->nullable();
             $table->timestamps();
-
-            $table->foreign('warga_id')->references('id')->on('warga')->onDelete('cascade');
         });
     }
 

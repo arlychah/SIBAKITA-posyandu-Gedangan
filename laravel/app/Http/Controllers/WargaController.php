@@ -100,7 +100,7 @@ class WargaController extends Controller
             'lansia.riwayat'
         ])->findOrFail($id);
 
-        return view('warga.detail', compact('warga'));
+        return view('warga.show', compact('warga'));
     }
 
     public function edit($id)
@@ -125,8 +125,16 @@ class WargaController extends Controller
         DB::beginTransaction();
         try {
             $warga = Warga::findOrFail($id);
-            $oldKategori = $warga->kategori;
-            $newKategori = $r->kategori;
+            $oldKategori = trim($warga->kategori);
+            $newKategori = trim($r->kategori);
+
+            $mapKategori = static function ($val){
+                $v = strtolower(trim($val));
+                if (strpos($v, 'balita') !== false) return 'Balita';
+                if (strpos($v, 'ibu') !== false) return 'Ibu Hamil';
+                if (strpos($v, 'lansia') !== false) return 'Lansia';
+                return $val;
+            };
 
             $warga->update([
                 'nik' => trim($r->nik),
@@ -142,29 +150,27 @@ class WargaController extends Controller
             ]);
 
             if ($oldKategori != $newKategori) {
-                if ($oldKategori == 'Balita' && $warga->balita) {
-                    $warga->balita->delete();
-                } elseif ($oldKategori == 'Ibu Hamil' && $warga->ibu_hamil) {
-                    $warga->ibu_hamil->delete();
-                } elseif ($oldKategori == 'Lansia' && $warga->lansia) {
-                    $warga->lansia->delete();
-                }
+                if ($oldKategori == 'Balita' || $oldKategori == 'balita') { $warga->balita()?->delete(); }
+                elseif ($oldKategori == 'Ibu Hamil' || $oldKategori == 'ibu_hamil' || $oldKategori == 'ibu hamil') { $warga->ibu_hamil()?->delete(); }
+                elseif ($oldKategori == 'Lansia' || $oldKategori == 'lansia') { $warga->lansia()?->delete(); }
 
-                if ($newKategori == 'Balita' && !$warga->balita) {
-                    Balita::create([
-                        'warga_id' => $warga->id,
-                        'nama_ibu' => trim($r->nama_ibu ?? ''),
-                        'nama_ayah' => trim($r->nama_ayah ?? ''),
-                    ]);
-                } elseif ($newKategori == 'Ibu Hamil' && !$warga->ibu_hamil) {
-                    IbuHamil::create([
-                        'warga_id' => $warga->id,
-                        'nama_suami' => trim($r->nama_suami ?? ''),
-                    ]);
-                } elseif ($newKategori == 'Lansia' && !$warga->lansia) {
-                    Lansia::create([
-                        'warga_id' => $warga->id,
-                    ]);
+                if ($newKategori == 'Balita') {
+                    Balita::updateOrCreate(
+                        ['warga_id' => $warga->id],
+                        [
+                            'nama_ibu' => trim($r->nama_ibu ?? ''),
+                            'nama_ayah' => trim($r->nama_ayah ?? ''),
+                        ]
+                    );
+                } elseif ($newKategori == 'Ibu Hamil') {
+                    IbuHamil::updateOrCreate(
+                        ['warga_id' => $warga->id],
+                        [
+                            'nama_suami' => trim($r->nama_suami ?? ''),
+                        ]
+                    );
+                } elseif ($newKategori == 'Lansia') {
+                    Lansia::firstOrCreate(['warga_id' => $warga->id]);
                 }
             } else {
                 if ($newKategori == 'Balita') {
@@ -182,6 +188,8 @@ class WargaController extends Controller
                             'nama_suami' => trim($r->nama_suami ?? ''),
                         ]
                     );
+                } elseif ($newKategori == 'Lansia') {
+                    Lansia::firstOrCreate(['warga_id' => $warga->id]);
                 }
             }
 

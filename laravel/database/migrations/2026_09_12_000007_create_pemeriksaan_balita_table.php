@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('pemeriksaan_balita', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('balita_id');
+            $table->foreignId('balita_id')->constrained('balita')->cascadeOnDelete();
             $table->date('tanggal');
             $table->float('berat_badan');
             $table->float('tinggi_badan');
@@ -31,8 +31,6 @@ return new class extends Migration
             $table->string('pmt_diterima', 100)->nullable();
             $table->text('catatan')->nullable();
             $table->timestamps();
-
-            $table->foreign('balita_id')->references('id')->on('balita')->onDelete('cascade');
         });
     }
 

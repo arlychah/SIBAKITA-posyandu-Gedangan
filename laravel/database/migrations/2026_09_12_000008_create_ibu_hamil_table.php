@@ -10,11 +10,9 @@ return new class extends Migration
     {
         Schema::create('ibu_hamil', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('warga_id')->unique();
+            $table->foreignId('warga_id')->unique()->constrained('warga')->cascadeOnDelete();
             $table->string('nama_suami', 200)->nullable();
             $table->timestamps();
-
-            $table->foreign('warga_id')->references('id')->on('warga')->onDelete('cascade');
         });
     }
 

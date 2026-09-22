@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('pemeriksaan_ibu_hamil', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('ibu_hamil_id');
+            $table->foreignId('ibu_hamil_id')->constrained('ibu_hamil')->cascadeOnDelete();
             $table->date('tanggal');
             $table->integer('kehamilan_ke')->nullable();
             $table->integer('usia_kehamilan')->nullable();
@@ -25,8 +25,6 @@ return new class extends Migration
             $table->string('imunisasi_tt', 50)->nullable();
             $table->text('catatan')->nullable();
             $table->timestamps();
-
-            $table->foreign('ibu_hamil_id')->references('id')->on('ibu_hamil')->onDelete('cascade');
         });
     }
 

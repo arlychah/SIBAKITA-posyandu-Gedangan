@@ -7,27 +7,34 @@ use App\Http\Controllers\BalitaController;
 use App\Http\Controllers\IbuHamilController;
 use App\Http\Controllers\LansiaController;
 use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\Auth\LoginController;
 
-Route::get('/', [DashboardController::class, 'index']);
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [LoginController::class, 'login']);
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
 
-Route::get('/warga', [WargaController::class, 'index']);
-Route::get('/warga/tambah', [WargaController::class, 'create']);
-Route::post('/warga/tambah', [WargaController::class, 'store']);
-Route::get('/warga/{id}', [WargaController::class, 'show']);
-Route::get('/warga/{id}/edit', [WargaController::class, 'edit']);
-Route::post('/warga/{id}/edit', [WargaController::class, 'update']);
-Route::post('/warga/{id}/hapus', [WargaController::class, 'destroy']);
+Route::middleware('auth')->group(function () {
+    Route::get('/', [DashboardController::class, 'index']);
 
-Route::get('/balita/periksa/{id}', [BalitaController::class, 'periksa']);
-Route::post('/balita/periksa/{id}', [BalitaController::class, 'periksa']);
+    Route::get('/warga', [WargaController::class, 'index']);
+    Route::get('/warga/tambah', [WargaController::class, 'create']);
+    Route::post('/warga/tambah', [WargaController::class, 'store']);
+    Route::get('/warga/{id}', [WargaController::class, 'show']);
+    Route::get('/warga/{id}/edit', [WargaController::class, 'edit']);
+    Route::post('/warga/{id}/edit', [WargaController::class, 'update']);
+    Route::post('/warga/{id}/hapus', [WargaController::class, 'destroy']);
 
-Route::get('/ibu_hamil/periksa/{id}', [IbuHamilController::class, 'periksa']);
-Route::post('/ibu_hamil/periksa/{id}', [IbuHamilController::class, 'periksa']);
+    Route::get('/balita/periksa/{id}', [BalitaController::class, 'periksa']);
+    Route::post('/balita/periksa/{id}', [BalitaController::class, 'periksa']);
 
-Route::get('/lansia/periksa/{id}', [LansiaController::class, 'periksa']);
-Route::post('/lansia/periksa/{id}', [LansiaController::class, 'periksa']);
+    Route::get('/ibu_hamil/periksa/{id}', [IbuHamilController::class, 'periksa']);
+    Route::post('/ibu_hamil/periksa/{id}', [IbuHamilController::class, 'periksa']);
 
-Route::get('/laporan', [LaporanController::class, 'index']);
-Route::get('/laporan/balita', [LaporanController::class, 'balita']);
-Route::get('/laporan/ibu_hamil', [LaporanController::class, 'ibuHamil']);
-Route::get('/laporan/lansia', [LaporanController::class, 'lansia']);
+    Route::get('/lansia/periksa/{id}', [LansiaController::class, 'periksa']);
+    Route::post('/lansia/periksa/{id}', [LansiaController::class, 'periksa']);
+
+    Route::get('/laporan', [LaporanController::class, 'index']);
+    Route::get('/laporan/balita', [LaporanController::class, 'balita']);
+    Route::get('/laporan/ibu_hamil', [LaporanController::class, 'ibuHamil']);
+    Route::get('/laporan/lansia', [LaporanController::class, 'lansia']);
+});

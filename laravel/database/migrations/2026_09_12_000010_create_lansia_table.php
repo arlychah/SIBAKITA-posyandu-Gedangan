@@ -10,10 +10,8 @@ return new class extends Migration
     {
         Schema::create('lansia', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('warga_id')->unique();
+            $table->foreignId('warga_id')->unique()->constrained('warga')->cascadeOnDelete();
             $table->timestamps();
-
-            $table->foreign('warga_id')->references('id')->on('warga')->onDelete('cascade');
         });
     }
 
