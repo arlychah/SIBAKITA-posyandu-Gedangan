@@ -324,9 +324,10 @@
                     <div class="credit-card">
                         <strong><i class="bi bi-key-fill me-1"></i> Akun Demo</strong>
                         <small>
-                            Admin: <code>admin@sibakita.test</code><br>
-                            Kader: <code>kader@sibakita.test</code><br>
-                            Warga: <code>budi@sibakita.test</code>
+                            Admin: <code>admin@sibakita.test</code> &nbsp; pass: <code>admin123</code><br>
+                            Kader: <code>kader@sibakita.test</code> &nbsp; pass: <code>kader123</code><br>
+                            Petugas: <code>petugas@sibakita.test</code> &nbsp; pass: <code>puskesmas123</code><br>
+                            Warga: <code>warga@sibakita.test</code> &nbsp; pass: <code>warga123</code>
                         </small>
                     </div>
                     <small class="mt-3 d-block">

@@ -23,12 +23,17 @@ class Warga extends Model
         'jenis_kelamin',
         'tempat_lahir',
         'tanggal_lahir',
+        'golongan_darah',
+        'agama',
+        'status_perkawinan',
+        'pekerjaan',
         'alamat',
         'kategori',
     ];
 
     protected $casts = [
         'tanggal_lahir' => 'date',
+        'golongan_darah' => 'string',
     ];
 
     protected $appends = [

@@ -14,7 +14,7 @@ class UserSeeder extends Seeder
             'name' => 'Administrator',
             'email' => 'admin@sibakita.test',
             'email_verified_at' => now(),
-            'password' => Hash::make('admin@sibakita2026'),
+            'password' => Hash::make('admin123'),
             'role' => 'admin',
         ]);
 
@@ -22,18 +22,26 @@ class UserSeeder extends Seeder
             'name' => 'Kader Posyandu Melati',
             'email' => 'kader@sibakita.test',
             'email_verified_at' => now(),
-            'password' => Hash::make('kader@posyandu2026'),
+            'password' => Hash::make('kader123'),
             'role' => 'kader',
         ]);
 
         User::create([
-            'name' => 'Budi Santoso',
-            'email' => 'budi@sibakita.test',
+            'name' => 'dr. Siti Rahmawati, Amd. Keb',
+            'email' => 'petugas@sibakita.test',
             'email_verified_at' => now(),
-            'password' => Hash::make('warga@sibakita2026'),
+            'password' => Hash::make('puskesmas123'),
+            'role' => 'petugas_kesehatan',
+        ]);
+
+        User::create([
+            'name' => 'Budi Santoso',
+            'email' => 'warga@sibakita.test',
+            'email_verified_at' => now(),
+            'password' => Hash::make('warga123'),
             'role' => 'pengunjung',
         ]);
 
-        User::factory(7)->create();
+        User::factory(6)->create();
     }
 }

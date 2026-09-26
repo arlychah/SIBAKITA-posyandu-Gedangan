@@ -19,6 +19,8 @@ class PemeriksaanLansia extends Model
         'tinggi_badan',
         'tekanan_darah_sistolik',
         'tekanan_darah_diastolik',
+        'nadi',
+        'imt',
         'gula_darah_puasa',
         'gula_darah_sewaktu',
         'kolesterol',
@@ -31,6 +33,8 @@ class PemeriksaanLansia extends Model
 
     protected $casts = [
         'tanggal' => 'date',
+        'nadi' => 'integer',
+        'imt' => 'float',
     ];
 
     public function lansia(): BelongsTo

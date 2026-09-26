@@ -18,6 +18,8 @@ class PemeriksaanBalita extends Model
         'berat_badan',
         'tinggi_badan',
         'lingkar_kepala',
+        'lila',
+        'suhu_tubuh',
         'status_gizi_bbu',
         'status_gizi_tbu',
         'status_gizi_bbtb',
@@ -45,6 +47,8 @@ class PemeriksaanBalita extends Model
         'imunisasi_polio2' => 'boolean',
         'imunisasi_polio3' => 'boolean',
         'imunisasi_campak' => 'boolean',
+        'lila' => 'float',
+        'suhu_tubuh' => 'float',
     ];
 
     public function balita(): BelongsTo

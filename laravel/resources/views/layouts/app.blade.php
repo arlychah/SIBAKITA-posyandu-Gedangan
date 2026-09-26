@@ -200,7 +200,7 @@
                             <div class="text-white-50 small text-truncate" style="font-size: 11px;">
                                 @php
                                     $role = Auth::user()->role ?? 'pengunjung';
-                                    $roleMap = ['admin' => 'Administrator', 'kader' => 'Kader Posyandu', 'pengunjung' => 'Warga/Pengunjung'];
+                                    $roleMap = ['admin' => 'Administrator', 'kader' => 'Kader Posyandu', 'pengunjung' => 'Warga/Pengunjung', 'petugas_kesehatan' => 'Petugas Puskesmas'];
                                     echo $roleMap[$role] ?? ucfirst($role);
                                 @endphp
                             </div>
@@ -261,7 +261,7 @@
                                     <i class="bi bi-person-gear me-2"></i>
                                     @php
                                         $role = Auth::user()->role ?? 'pengunjung';
-                                        $roleBadge = ['admin' => 'Administrator', 'kader' => 'Kader Posyandu', 'pengunjung' => 'Warga/Pengunjung'];
+                                        $roleBadge = ['admin' => 'Administrator', 'kader' => 'Kader Posyandu', 'pengunjung' => 'Warga/Pengunjung', 'petugas_kesehatan' => 'Petugas Kesehatan Puskesmas'];
                                         echo $roleBadge[$role] ?? ucfirst($role);
                                     @endphp
                                 </span>

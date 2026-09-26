@@ -46,6 +46,14 @@ class WargaFactory extends Factory
             'jenis_kelamin' => $kategori === 'Ibu Hamil' ? 'Perempuan' : $jenis_kelamin,
             'tempat_lahir' => $this->faker->city(),
             'tanggal_lahir' => $tanggal_lahir,
+            'golongan_darah' => $this->faker->randomElement(['A', 'B', 'AB', 'O', 'Tidak Tahu']),
+            'agama' => $this->faker->randomElement(['Islam', 'Kristen', 'Katolik', 'Hindu', 'Budha', 'Konghucu']),
+            'status_perkawinan' => $kategori === 'Ibu Hamil'
+                ? $this->faker->randomElement(['Kawin'])
+                : $this->faker->randomElement(['Belum Kawin', 'Kawin', 'Cerai Hidup', 'Cerai Mati']),
+            'pekerjaan' => $kategori === 'Balita'
+                ? 'Belum Bekerja'
+                : $this->faker->randomElement(['IRT', 'PNS', 'TNI/Polri', 'Karyawan Swasta', 'Wiraswasta', 'Petani', 'Buruh', 'Pelajar/Mahasiswa', 'Tidak Bekerja']),
             'alamat' => 'Jl. ' . $this->faker->streetName() . ' No. ' . $this->faker->buildingNumber() . ', ' . $this->faker->city(),
             'kategori' => $kategori,
         ];

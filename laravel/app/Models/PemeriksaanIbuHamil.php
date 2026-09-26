@@ -23,6 +23,8 @@ class PemeriksaanIbuHamil extends Model
         'lila',
         'tinggi_fundus',
         'detak_jantung_janin',
+        'nadi',
+        'hemoglobin',
         'ttd_diberikan',
         'jumlah_ttd',
         'imunisasi_tt',
@@ -32,6 +34,8 @@ class PemeriksaanIbuHamil extends Model
     protected $casts = [
         'tanggal' => 'date',
         'ttd_diberikan' => 'boolean',
+        'nadi' => 'integer',
+        'hemoglobin' => 'float',
     ];
 
     public function ibu_hamil(): BelongsTo

@@ -15,6 +15,8 @@ return new class extends Migration
             $table->float('berat_badan');
             $table->float('tinggi_badan');
             $table->float('lingkar_kepala')->nullable();
+            $table->float('lila')->nullable();
+            $table->float('suhu_tubuh')->nullable();
             $table->string('status_gizi_bbu', 50)->nullable();
             $table->string('status_gizi_tbu', 50)->nullable();
             $table->string('status_gizi_bbtb', 50)->nullable();

@@ -20,6 +20,8 @@ return new class extends Migration
             $table->float('lila')->nullable();
             $table->float('tinggi_fundus')->nullable();
             $table->integer('detak_jantung_janin')->nullable();
+            $table->integer('nadi')->nullable();
+            $table->float('hemoglobin')->nullable();
             $table->boolean('ttd_diberikan')->default(false);
             $table->integer('jumlah_ttd')->nullable();
             $table->string('imunisasi_tt', 50)->nullable();

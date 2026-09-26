@@ -16,6 +16,8 @@ return new class extends Migration
             $table->float('tinggi_badan')->nullable();
             $table->integer('tekanan_darah_sistolik')->nullable();
             $table->integer('tekanan_darah_diastolik')->nullable();
+            $table->integer('nadi')->nullable();
+            $table->float('imt')->nullable();
             $table->float('gula_darah_puasa')->nullable();
             $table->float('gula_darah_sewaktu')->nullable();
             $table->float('kolesterol')->nullable();

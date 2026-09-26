@@ -18,6 +18,10 @@ return new class extends Migration
             $table->string('jenis_kelamin', 20);
             $table->string('tempat_lahir', 100)->nullable();
             $table->date('tanggal_lahir');
+            $table->enum('golongan_darah', ['A', 'B', 'AB', 'O', 'Tidak Tahu'])->nullable();
+            $table->string('agama', 30)->nullable();
+            $table->string('status_perkawinan', 30)->nullable();
+            $table->string('pekerjaan', 100)->nullable();
             $table->text('alamat')->nullable();
             $table->string('kategori', 50);
             $table->timestamps();
