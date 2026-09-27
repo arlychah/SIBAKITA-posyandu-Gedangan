@@ -13,8 +13,8 @@ class BalitaController extends Controller
     {
         $balita = Balita::with(['warga', 'riwayat'])->findOrFail($id);
         $warga = $balita->warga;
-        $umurTahun = $warga->umur_tahun;
-        $umurBulan = $warga->umur_bulan;
+        $umur_tahun = $warga->umur_tahun;
+        $umur_bulan = $warga->umur_bulan;
 
         if ($r->isMethod('POST')) {
             $r->validate([
@@ -26,7 +26,7 @@ class BalitaController extends Controller
             $beratBadan = (float)$r->berat_badan;
             $tinggiBadan = (float)$r->tinggi_badan;
             $jk = $warga->jenis_kelamin;
-            $totalBulan = $umurBulan;
+            $totalBulan = $umur_bulan;
 
             $statusBBU = StatusGizi::bbu($beratBadan, $totalBulan, $jk);
             $statusTBU = StatusGizi::tbu($tinggiBadan, $totalBulan, $jk);
@@ -62,6 +62,6 @@ class BalitaController extends Controller
             ->orderBy('tanggal', 'desc')
             ->get();
 
-        return view('balita.periksa', compact('balita', 'umurTahun', 'umurBulan', 'riwayat'));
+        return view('balita.periksa', compact('balita', 'umur_tahun', 'umur_bulan', 'riwayat'));
     }
 }

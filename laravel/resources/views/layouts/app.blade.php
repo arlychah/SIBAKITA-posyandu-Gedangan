@@ -199,8 +199,8 @@
                             <div class="text-white fw-semibold small text-truncate">{{ Auth::user()->name ?? 'Tamu' }}</div>
                             <div class="text-white-50 small text-truncate" style="font-size: 11px;">
                                 @php
-                                    $role = Auth::user()->role ?? 'pengunjung';
-                                    $roleMap = ['admin' => 'Administrator', 'kader' => 'Kader Posyandu', 'pengunjung' => 'Warga/Pengunjung', 'petugas_kesehatan' => 'Petugas Puskesmas'];
+                                    $role = Auth::user()->role ?? 'warga';
+                                    $roleMap = ['admin' => 'Administrator', 'kader' => 'Kader Posyandu', 'warga' => 'Warga', 'petugas' => 'Petugas Kesehatan'];
                                     echo $roleMap[$role] ?? ucfirst($role);
                                 @endphp
                             </div>
@@ -260,8 +260,8 @@
                                 <span class="dropdown-item-text small text-muted px-3 py-2">
                                     <i class="bi bi-person-gear me-2"></i>
                                     @php
-                                        $role = Auth::user()->role ?? 'pengunjung';
-                                        $roleBadge = ['admin' => 'Administrator', 'kader' => 'Kader Posyandu', 'pengunjung' => 'Warga/Pengunjung', 'petugas_kesehatan' => 'Petugas Kesehatan Puskesmas'];
+                                        $role = Auth::user()->role ?? 'warga';
+                                        $roleBadge = ['admin' => 'Administrator', 'kader' => 'Kader Posyandu', 'warga' => 'Warga', 'petugas' => 'Petugas Kesehatan Puskesmas'];
                                         echo $roleBadge[$role] ?? ucfirst($role);
                                     @endphp
                                 </span>

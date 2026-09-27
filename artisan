@@ -1,0 +1,7 @@
+#!/usr/bin/env php
+<?php
+
+$laravelPath = __DIR__ . DIRECTORY_SEPARATOR . 'laravel';
+
+chdir($laravelPath);
+require $laravelPath . DIRECTORY_SEPARATOR . 'artisan';

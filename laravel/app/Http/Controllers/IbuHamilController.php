@@ -10,7 +10,7 @@ class IbuHamilController extends Controller
 {
     public function periksa(Request $r, $id)
     {
-        $ibu = IbuHamil::with(['warga', 'riwayat'])->findOrFail($id);
+        $ibu_hamil = IbuHamil::with(['warga', 'riwayat'])->findOrFail($id);
 
         if ($r->isMethod('POST')) {
             $tanggal = $r->tanggal ? date('Y-m-d', strtotime($r->tanggal)) : date('Y-m-d');
@@ -40,6 +40,6 @@ class IbuHamilController extends Controller
             ->orderBy('tanggal', 'desc')
             ->get();
 
-        return view('ibu_hamil.periksa', compact('ibu', 'riwayat'));
+        return view('ibu_hamil.periksa', compact('ibu_hamil', 'riwayat'));
     }
 }

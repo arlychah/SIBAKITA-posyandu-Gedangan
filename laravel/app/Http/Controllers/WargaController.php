@@ -36,7 +36,7 @@ class WargaController extends Controller
 
     public function create()
     {
-        return view('warga.tambah');
+        return view('warga.create');
     }
 
     public function store(Request $r)

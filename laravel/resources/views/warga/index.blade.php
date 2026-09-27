@@ -32,7 +32,7 @@
 
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0"><i class="bi bi-people-fill text-primary me-2"></i>Data Warga ({{ count($warga_list) }} orang)</h5>
+        <h5 class="mb-0"><i class="bi bi-people-fill text-primary me-2"></i>Data Warga ({{ $wargaList->total() }} orang)</h5>
         <div class="d-flex gap-2">
             <span class="badge bg-info"><i class="bi bi-baby me-1"></i>Balita</span>
             <span class="badge bg-warning text-dark"><i class="bi bi-person-pregnant me-1"></i>Ibu Hamil</span>
@@ -54,7 +54,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($warga_list as $w)
+                    @forelse($wargaList as $w)
                     <tr>
                         <td class="ps-4"><code class="text-muted">{{ $w->nik }}</code></td>
                         <td>

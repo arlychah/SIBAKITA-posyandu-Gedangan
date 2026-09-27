@@ -12,7 +12,7 @@ class LaporanController extends Controller
 {
     public function index()
     {
-        return view('laporan');
+        return view('laporan.index');
     }
 
     public function balita(Request $r)
@@ -66,7 +66,15 @@ class LaporanController extends Controller
             return $d->ttd_diberikan === true;
         })->count();
 
-        return view('laporan.ibu_hamil', compact('data', 'total', 'risikoKek', 'tdTinggi', 'ttdDiberikan', 'start', 'end'));
+        return view('laporan.ibu_hamil', [
+            'data' => $data,
+            'total' => $total,
+            'risiko_kek' => $risikoKek,
+            'td_tinggi' => $tdTinggi,
+            'ttd_diberikan' => $ttdDiberikan,
+            'start' => $start,
+            'end' => $end,
+        ]);
     }
 
     public function lansia(Request $r)
