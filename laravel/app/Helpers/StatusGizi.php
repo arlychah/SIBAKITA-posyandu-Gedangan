@@ -18,11 +18,53 @@ class StatusGizi
         return self::klasifikasiTBU($zScore);
     }
 
-    public static function bbtb($berat, $tinggi, $umurBulan, $jk)
+    public static function bbtb($berat, $statureCm, $umurBulan, $jk, $metodePengukuran): array
     {
-        $jkCode = ($jk === 'Laki-laki') ? 'L' : 'P';
-        $zScore = self::hitungZScoreBBTB($berat, $tinggi, $jkCode);
-        return self::klasifikasiBBTB($zScore);
+        if (!is_numeric($berat) || $berat <= 0 || !is_numeric($statureCm) || $statureCm <= 0) {
+            return self::hasilBbtb(null, null, 'Data berat/panjang/tinggi tidak valid.');
+        }
+
+        if (!in_array($metodePengukuran, ['standing', 'recumbent'], true)) {
+            return self::hasilBbtb(null, null, 'Metode pengukuran belum dipilih.');
+        }
+        if ($umurBulan < 0 || $umurBulan > 60) {
+            return self::hasilBbtb(null, null, 'BB/TB WHO 2006 hanya mencakup usia 0–60 bulan; perlu evaluasi petugas.');
+        }
+
+        $jkCode = ($jk === 'Laki-laki') ? 'boys' : 'girls';
+        $indikator = $umurBulan < 24 ? 'wfl' : 'wfh';
+        $metodeAcuan = $umurBulan < 24 ? 'recumbent' : 'standing';
+        $statureAcuan = (float) $statureCm;
+
+        if ($metodePengukuran !== $metodeAcuan) {
+            $statureAcuan += $metodeAcuan === 'recumbent' ? 0.7 : -0.7;
+        }
+
+        $lms = \App\Support\Who2006WflWfhTable::lookup($indikator, $jkCode, $statureAcuan);
+        if ($lms === null) {
+            return self::hasilBbtb(
+                null,
+                $indikator,
+                'Panjang/tinggi berada di luar rentang tabel WHO; perlu evaluasi petugas.'
+            );
+        }
+
+        $ratio = (float) $berat / $lms['m'];
+        $zScore = $lms['l'] == 0.0
+            ? log($ratio) / $lms['s']
+            : (pow($ratio, $lms['l']) - 1) / ($lms['l'] * $lms['s']);
+
+        return self::hasilBbtb($zScore, $indikator, self::klasifikasiBBTB($zScore), $statureAcuan);
+    }
+
+    private static function hasilBbtb(?float $zScore, ?string $indikator, string $status, ?float $statureAcuan = null): array
+    {
+        return [
+            'status' => $status,
+            'z_score' => $zScore,
+            'reference' => $indikator ? strtoupper($indikator) : null,
+            'stature_reference_cm' => $statureAcuan,
+        ];
     }
 
     private static function klasifikasiBBU($zScore)
@@ -146,17 +188,8 @@ class StatusGizi
 
     private static function hitungZScoreBBTB($beratBadan, $tinggiBadan, $jenisKelamin)
     {
-        $tbBulat = (int)$tinggiBadan;
-        if ($tbBulat < 49) $tbBulat = 49;
-        if ($tbBulat > 120) $tbBulat = 120;
-
-        if ($jenisKelamin == 'L') {
-            $median = 0.0245 * $tbBulat * $tbBulat - 2.2 * $tbBulat + 52.0;
-        } else {
-            $median = 0.024 * $tbBulat * $tbBulat - 2.15 * $tbBulat + 51.0;
-        }
-
-        $sd = $median * 0.11;
-        return $sd > 0 ? ($beratBadan - $median) / $sd : 0;
+        // Retained as a protected compatibility placeholder for the age-based BBU/TBU helpers.
+        // BB/TB/WFL/WFH now uses the official WHO 2006 LMS tables above.
+        return 0;
     }
 }

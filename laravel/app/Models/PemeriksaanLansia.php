@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PemeriksaanLansia extends Model
 {
@@ -29,10 +30,16 @@ class PemeriksaanLansia extends Model
         'penglihatan',
         'pendengaran',
         'catatan',
+        'submitted_by',
+        'verification_status',
+        'verified_by',
+        'verified_at',
+        'return_reason',
     ];
 
     protected $casts = [
         'tanggal' => 'date',
+        'verified_at' => 'datetime',
         'nadi' => 'integer',
         'imt' => 'float',
     ];
@@ -40,5 +47,21 @@ class PemeriksaanLansia extends Model
     public function lansia(): BelongsTo
     {
         return $this->belongsTo(Lansia::class, 'lansia_id');
+    }
+
+    public function submitter(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'submitted_by');
+    }
+
+    public function verifier(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'verified_by');
+    }
+
+    public function auditLogs(): HasMany
+    {
+        return $this->hasMany(PemeriksaanAuditLog::class, 'pemeriksaan_id')
+            ->where('jenis_pemeriksaan', 'lansia');
     }
 }

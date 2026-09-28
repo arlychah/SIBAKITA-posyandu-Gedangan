@@ -21,6 +21,7 @@ class LaporanController extends Controller
         $end = $r->input('end', Carbon::now()->format('Y-m-d'));
 
         $query = PemeriksaanBalita::with(['balita.warga'])
+            ->where('verification_status', 'verified')
             ->whereBetween('tanggal', [$start, $end]);
 
         $data = $query->orderBy('tanggal', 'desc')->get();
@@ -49,6 +50,7 @@ class LaporanController extends Controller
         $end = $r->input('end', Carbon::now()->format('Y-m-d'));
 
         $query = PemeriksaanIbuHamil::with(['ibu_hamil.warga'])
+            ->where('verification_status', 'verified')
             ->whereBetween('tanggal', [$start, $end]);
 
         $data = $query->orderBy('tanggal', 'desc')->get();
@@ -83,6 +85,7 @@ class LaporanController extends Controller
         $end = $r->input('end', Carbon::now()->format('Y-m-d'));
 
         $query = PemeriksaanLansia::with(['lansia.warga'])
+            ->where('verification_status', 'verified')
             ->whereBetween('tanggal', [$start, $end]);
 
         $data = $query->orderBy('tanggal', 'desc')->get();

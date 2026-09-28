@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PemeriksaanBalita extends Model
 {
@@ -35,10 +36,20 @@ class PemeriksaanBalita extends Model
         'vitamin_a_bulan_ke',
         'pmt_diterima',
         'catatan',
+        'submitted_by',
+        'verification_status',
+        'verified_by',
+        'verified_at',
+        'return_reason',
+        'metode_pengukuran',
+        'rujukan_bbtb',
+        'z_score_bbtb',
     ];
 
     protected $casts = [
         'tanggal' => 'date',
+        'verified_at' => 'datetime',
+        'z_score_bbtb' => 'float',
         'imunisasi_bcg' => 'boolean',
         'imunisasi_dpt1' => 'boolean',
         'imunisasi_dpt2' => 'boolean',
@@ -54,5 +65,21 @@ class PemeriksaanBalita extends Model
     public function balita(): BelongsTo
     {
         return $this->belongsTo(Balita::class, 'balita_id');
+    }
+
+    public function submitter(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'submitted_by');
+    }
+
+    public function verifier(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'verified_by');
+    }
+
+    public function auditLogs(): HasMany
+    {
+        return $this->hasMany(PemeriksaanAuditLog::class, 'pemeriksaan_id')
+            ->where('jenis_pemeriksaan', 'balita');
     }
 }

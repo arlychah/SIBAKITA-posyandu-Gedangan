@@ -19,7 +19,8 @@ class WargaController extends Controller
         $query = Warga::with(['balita', 'ibu_hamil', 'lansia']);
 
         if ($kategori) {
-            $query->where('kategori', $kategori);
+            $kategoriNormal = strtolower(str_replace(' ', '_', $kategori));
+            $query->whereRaw("LOWER(REPLACE(kategori, ' ', '_')) = ?", [$kategoriNormal]);
         }
 
         if ($search) {

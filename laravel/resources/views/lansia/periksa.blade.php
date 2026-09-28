@@ -44,9 +44,10 @@
                     </div>
                 </div>
             </div>
-            <form method="POST" action="{{ url("/lansia/periksa/{$lansia->id}") }}">
+            <form method="POST" action="{{ $correction ? route('lansia.periksa.koreksi.update', [$lansia->id, $existingRecord->id]) : route('lansia.periksa.store', $lansia->id) }}">
                 @csrf
                 <div class="card-body">
+                    @if($correction)<div class="alert alert-warning" role="status"><strong>Perlu perbaikan:</strong> {{ $existingRecord->return_reason }}</div>@endif
                     <div class="card mb-4 border">
                         <div class="card-header bg-light">
                             <h6 class="mb-0 text-success"><i class="bi bi-calendar-week me-2"></i>Identitas & Antropometri Dasar</h6>
@@ -54,16 +55,16 @@
                         <div class="card-body">
                             <div class="row g-3">
                                 <div class="col-md-4">
-                                    <label class="form-label fw-bold">Tanggal Pemeriksaan</label>
-                                    <input type="date" name="tanggal" class="form-control" value="{{ date('Y-m-d') }}">
+                                    <label for="lansia-tanggal" class="form-label fw-bold">Tanggal Pemeriksaan</label>
+                                    <input id="lansia-tanggal" type="date" name="tanggal" class="form-control" required value="{{ old('tanggal', $existingRecord?->tanggal?->format('Y-m-d') ?? date('Y-m-d')) }}">
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label fw-bold">Berat Badan (kg)</label>
-                                    <input type="number" step="0.1" name="berat_badan" class="form-control" placeholder="contoh: 60.5">
+                                    <label for="lansia-berat" class="form-label fw-bold">Berat Badan (kg)</label>
+                                    <input id="lansia-berat" type="number" step="0.1" name="berat_badan" class="form-control" placeholder="contoh: 60.5" value="{{ old('berat_badan', $existingRecord?->berat_badan) }}">
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label fw-bold">Tinggi Badan (cm)</label>
-                                    <input type="number" step="0.1" name="tinggi_badan" class="form-control" placeholder="contoh: 160">
+                                    <label for="lansia-tinggi" class="form-label fw-bold">Tinggi Badan (cm)</label>
+                                    <input id="lansia-tinggi" type="number" step="0.1" name="tinggi_badan" class="form-control" placeholder="contoh: 160" value="{{ old('tinggi_badan', $existingRecord?->tinggi_badan) }}">
                                 </div>
                             </div>
                         </div>
@@ -75,33 +76,33 @@
                         <div class="card-body">
                             <div class="row g-3 mb-4">
                                 <div class="col-md-3">
-                                    <label class="form-label fw-bold">TD Sistolik</label>
-                                    <input type="number" name="tekanan_darah_sistolik" class="form-control" placeholder="120">
+                                    <label for="lansia-td-sistolik" class="form-label fw-bold">TD Sistolik</label>
+                                    <input id="lansia-td-sistolik" type="number" name="tekanan_darah_sistolik" class="form-control" placeholder="120" value="{{ old('tekanan_darah_sistolik', $existingRecord?->tekanan_darah_sistolik) }}">
                                     <small class="text-danger">Hipertensi ≥ 140 mmHg</small>
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="form-label fw-bold">TD Diastolik</label>
-                                    <input type="number" name="tekanan_darah_diastolik" class="form-control" placeholder="80">
+                                    <label for="lansia-td-diastolik" class="form-label fw-bold">TD Diastolik</label>
+                                    <input id="lansia-td-diastolik" type="number" name="tekanan_darah_diastolik" class="form-control" placeholder="80" value="{{ old('tekanan_darah_diastolik', $existingRecord?->tekanan_darah_diastolik) }}">
                                     <small class="text-muted">mmHg normal < 90</small>
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="form-label fw-bold">Gula Darah Puasa (mg/dL)</label>
-                                    <input type="number" step="0.1" name="gula_darah_puasa" class="form-control" placeholder="contoh: 95">
+                                    <label for="lansia-gdp" class="form-label fw-bold">Gula Darah Puasa (mg/dL)</label>
+                                    <input id="lansia-gdp" type="number" step="0.1" name="gula_darah_puasa" class="form-control" placeholder="contoh: 95" value="{{ old('gula_darah_puasa', $existingRecord?->gula_darah_puasa) }}">
                                     <small class="text-danger">Diabetes ≥ 126</small>
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="form-label fw-bold">Gula Darah Sewaktu (mg/dL)</label>
-                                    <input type="number" step="0.1" name="gula_darah_sewaktu" class="form-control" placeholder="contoh: 110">
+                                    <label for="lansia-gds" class="form-label fw-bold">Gula Darah Sewaktu (mg/dL)</label>
+                                    <input id="lansia-gds" type="number" step="0.1" name="gula_darah_sewaktu" class="form-control" placeholder="contoh: 110" value="{{ old('gula_darah_sewaktu', $existingRecord?->gula_darah_sewaktu) }}">
                                     <small class="text-danger">≥ 200 Diabetes</small>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold">Kolesterol Total (mg/dL)</label>
-                                    <input type="number" step="0.1" name="kolesterol" class="form-control" placeholder="contoh: 180">
+                                    <label for="lansia-kolesterol" class="form-label fw-bold">Kolesterol Total (mg/dL)</label>
+                                    <input id="lansia-kolesterol" type="number" step="0.1" name="kolesterol" class="form-control" placeholder="contoh: 180" value="{{ old('kolesterol', $existingRecord?->kolesterol) }}">
                                     <small class="text-danger">Tinggi ≥ 200</small>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold">Asam Urat (mg/dL)</label>
-                                    <input type="number" step="0.1" name="asam_urat" class="form-control" placeholder="contoh: 6.0">
+                                    <label for="lansia-asam-urat" class="form-label fw-bold">Asam Urat (mg/dL)</label>
+                                    <input id="lansia-asam-urat" type="number" step="0.1" name="asam_urat" class="form-control" placeholder="contoh: 6.0" value="{{ old('asam_urat', $existingRecord?->asam_urat) }}">
                                     <small class="text-muted">Normal: P ≤ 6 / W ≤ 7</small>
                                 </div>
                             </div>
@@ -114,41 +115,35 @@
                         <div class="card-body">
                             <div class="row g-3">
                                 <div class="col-md-4">
-                                    <label class="form-label fw-bold">Skrining Jiwa (GDS-15 / MMSE)</label>
-                                    <select name="skrining_jiwa" class="form-select">
+                                    <label for="lansia-skrining-jiwa" class="form-label fw-bold">Skrining Jiwa (GDS-15 / MMSE)</label>
+                                    <select id="lansia-skrining-jiwa" name="skrining_jiwa" class="form-select">
                                         <option value="">-- Hasil --</option>
-                                        <option>Normal (Tidak Ada Gangguan)</option>
-                                        <option>Gejala Depresi Ringan</option>
-                                        <option>Gejala Depresi (Dirujuk)</option>
-                                        <option>Gangguan Kognitif Ringan</option>
-                                        <option>Suspek Demensia (Dirujuk)</option>
+                                        @foreach(['Normal (Tidak Ada Gangguan)', 'Gejala Depresi Ringan', 'Gejala Depresi (Dirujuk)', 'Gangguan Kognitif Ringan', 'Suspek Demensia (Dirujuk)'] as $option)
+                                            <option value="{{ $option }}" @selected(old('skrining_jiwa', $existingRecord?->skrining_jiwa) === $option)>{{ $option }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label fw-bold">Tes Penglihatan (Visus)</label>
-                                    <select name="penglihatan" class="form-select">
+                                    <label for="lansia-penglihatan" class="form-label fw-bold">Tes Penglihatan (Visus)</label>
+                                    <select id="lansia-penglihatan" name="penglihatan" class="form-select">
                                         <option value="">-- Pilih --</option>
-                                        <option>Normal (6/6 Snellen)</option>
-                                        <option>Berkurang Ringan (6/9 - 6/12)</option>
-                                        <option>Berkurang Berat (6/18 - 6/60)</option>
-                                        <option>Low Vision / Katarak (Dirujuk)</option>
-                                        <option>Buta / Kebutaan</option>
+                                        @foreach(['Normal (6/6 Snellen)', 'Berkurang Ringan (6/9 - 6/12)', 'Berkurang Berat (6/18 - 6/60)', 'Low Vision / Katarak (Dirujuk)', 'Buta / Kebutaan'] as $option)
+                                            <option value="{{ $option }}" @selected(old('penglihatan', $existingRecord?->penglihatan) === $option)>{{ $option }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label fw-bold">Tes Pendengaran (Whisper Test)</label>
-                                    <select name="pendengaran" class="form-select">
+                                    <label for="lansia-pendengaran" class="form-label fw-bold">Tes Pendengaran (Whisper Test)</label>
+                                    <select id="lansia-pendengaran" name="pendengaran" class="form-select">
                                         <option value="">-- Pilih --</option>
-                                        <option>Normal (Dengar Bisikan)</option>
-                                        <option>Ringan (Sulit Bisikan, OK Suara Biasa)</option>
-                                        <option>Sedang (Perlu Mengulang)</option>
-                                        <option>Berat (Sering Salah Dengar) - Dirujuk</option>
-                                        <option>Tuli</option>
+                                        @foreach(['Normal (Dengar Bisikan)', 'Ringan (Sulit Bisikan, OK Suara Biasa)', 'Sedang (Perlu Mengulang)', 'Berat (Sering Salah Dengar) - Dirujuk', 'Tuli'] as $option)
+                                            <option value="{{ $option }}" @selected(old('pendengaran', $existingRecord?->pendengaran) === $option)>{{ $option }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                                 <div class="col-md-12">
-                                    <label class="form-label fw-bold">Catatan Kader / Rujukan / Obat</label>
-                                    <textarea name="catatan" rows="2" class="form-control" placeholder="Konseling diet rendah garam, obat anti-hipertensi, rujuk Pustu/Puskesmas dst."></textarea>
+                                    <label for="lansia-catatan" class="form-label fw-bold">Catatan Kader / Rujukan / Obat</label>
+                                    <textarea id="lansia-catatan" name="catatan" rows="2" class="form-control" placeholder="Konseling diet rendah garam, obat anti-hipertensi, rujuk Pustu/Puskesmas dst.">{{ old('catatan', $existingRecord?->catatan) }}</textarea>
                                 </div>
                             </div>
                         </div>

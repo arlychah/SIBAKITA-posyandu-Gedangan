@@ -3,36 +3,38 @@
 namespace App\Http\Controllers;
 
 use App\Models\Warga;
+use App\Models\Balita;
+use App\Models\IbuHamil;
+use App\Models\Lansia;
 use App\Models\PemeriksaanBalita;
 use App\Models\PemeriksaanIbuHamil;
 use App\Models\PemeriksaanLansia;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $totalWarga = Warga::count();
-        $totalBalita = Warga::where('kategori', 'Balita')->count();
-        $pemeriksaanBalita = PemeriksaanBalita::count();
-        $totalIbuHamil = Warga::where('kategori', 'Ibu Hamil')->count();
-        $pemeriksaanIbuHamil = PemeriksaanIbuHamil::count();
-        $totalLansia = Warga::where('kategori', 'Lansia')->count();
-        $pemeriksaanLansia = PemeriksaanLansia::count();
-        $latestWarga = Warga::with(['balita', 'ibu_hamil', 'lansia'])
-            ->orderBy('created_at', 'desc')
-            ->limit(5)
-            ->get();
+        $user = Auth::user();
 
-        return view('dashboard', compact(
-            'totalWarga',
-            'totalBalita',
-            'pemeriksaanBalita',
-            'totalIbuHamil',
-            'pemeriksaanIbuHamil',
-            'totalLansia',
-            'pemeriksaanLansia',
-            'latestWarga'
-        ));
+        if ($user->role === 'warga') {
+            return redirect()->route('dashboard.anggota');
+        }
+        if ($user->role === 'kader') {
+            return redirect()->route('dashboard.kader');
+        }
+        if ($user->role === 'petugas') {
+            return redirect()->route('dashboard.petugas');
+        }
+
+        return view('dashboard.admin', [
+            'totalWarga' => Warga::count(),
+            'totalBalita' => Balita::count(),
+            'totalIbuHamil' => IbuHamil::count(),
+            'totalLansia' => Lansia::count(),
+            'menungguVerifikasi' => PemeriksaanBalita::where('verification_status', 'pending')->count()
+                + PemeriksaanIbuHamil::where('verification_status', 'pending')->count()
+                + PemeriksaanLansia::where('verification_status', 'pending')->count(),
+        ]);
     }
 }

@@ -4,42 +4,105 @@ namespace App\Http\Controllers;
 
 use App\Models\IbuHamil;
 use App\Models\PemeriksaanIbuHamil;
+use App\Services\PemeriksaanAuditService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class IbuHamilController extends Controller
 {
-    public function periksa(Request $r, $id)
+    public function periksa(Request $request, int $id)
     {
-        $ibu_hamil = IbuHamil::with(['warga', 'riwayat'])->findOrFail($id);
+        return $this->handleForm($request, $id, null);
+    }
 
-        if ($r->isMethod('POST')) {
-            $tanggal = $r->tanggal ? date('Y-m-d', strtotime($r->tanggal)) : date('Y-m-d');
-            $ttdDiberikan = $r->has('ttd_diberikan') ? true : false;
+    public function koreksi(Request $request, int $id, int $pemeriksaan)
+    {
+        return $this->handleForm($request, $id, $pemeriksaan);
+    }
 
-            PemeriksaanIbuHamil::create([
-                'ibu_hamil_id' => $id,
-                'tanggal' => $tanggal,
-                'kehamilan_ke' => $r->kehamilan_ke ? (int)$r->kehamilan_ke : null,
-                'usia_kehamilan' => $r->usia_kehamilan ? (int)$r->usia_kehamilan : null,
-                'berat_badan' => $r->berat_badan ? (float)$r->berat_badan : null,
-                'tekanan_darah_sistolik' => $r->tekanan_darah_sistolik ? (int)$r->tekanan_darah_sistolik : null,
-                'tekanan_darah_diastolik' => $r->tekanan_darah_diastolik ? (int)$r->tekanan_darah_diastolik : null,
-                'lila' => $r->lila ? (float)$r->lila : null,
-                'tinggi_fundus' => $r->tinggi_fundus ? (float)$r->tinggi_fundus : null,
-                'detak_jantung_janin' => $r->detak_jantung_janin ? (int)$r->detak_jantung_janin : null,
-                'ttd_diberikan' => $ttdDiberikan,
-                'jumlah_ttd' => $r->jumlah_ttd ? (int)$r->jumlah_ttd : null,
-                'imunisasi_tt' => $r->imunisasi_tt ?? '',
-                'catatan' => $r->catatan ?? '',
-            ]);
+    private function handleForm(Request $request, int $id, ?int $correctionId)
+    {
+        $ibuHamil = IbuHamil::with(['warga', 'riwayat'])->findOrFail($id);
+        $correction = $correctionId !== null;
+        $existingRecord = null;
 
-            return back()->with('success', 'Pemeriksaan ibu hamil berhasil dicatat!');
+        if ($correction) {
+            $existingRecord = PemeriksaanIbuHamil::where('id', $correctionId)
+                ->where('ibu_hamil_id', $ibuHamil->id)
+                ->where('submitted_by', Auth::id())
+                ->where('verification_status', 'needs_revision')
+                ->firstOrFail();
         }
 
-        $riwayat = PemeriksaanIbuHamil::where('ibu_hamil_id', $id)
-            ->orderBy('tanggal', 'desc')
-            ->get();
+        if ($request->isMethod('POST')) {
+            $data = $request->validate([
+                'tanggal' => ['required', 'date', 'before_or_equal:today'],
+                'kehamilan_ke' => ['nullable', 'integer', 'min:1', 'max:10'],
+                'usia_kehamilan' => ['nullable', 'integer', 'min:1', 'max:42'],
+                'berat_badan' => ['nullable', 'numeric', 'gt:0', 'max:250'],
+                'tekanan_darah_sistolik' => ['nullable', 'integer', 'between:40,300'],
+                'tekanan_darah_diastolik' => ['nullable', 'integer', 'between:20,200'],
+                'lila' => ['nullable', 'numeric', 'between:5,80'],
+                'tinggi_fundus' => ['nullable', 'numeric', 'between:1,60'],
+                'detak_jantung_janin' => ['nullable', 'integer', 'between:50,250'],
+                'jumlah_ttd' => ['nullable', 'integer', 'min:0', 'max:1000'],
+                'imunisasi_tt' => ['nullable', 'string', 'max:50'],
+                'catatan' => ['nullable', 'string', 'max:4000'],
+            ]);
 
-        return view('ibu_hamil.periksa', compact('ibu_hamil', 'riwayat'));
+            $payload = [
+                'tanggal' => Carbon::parse($data['tanggal'])->toDateString(),
+                'kehamilan_ke' => $data['kehamilan_ke'] ?? null,
+                'usia_kehamilan' => $data['usia_kehamilan'] ?? null,
+                'berat_badan' => $data['berat_badan'] ?? null,
+                'tekanan_darah_sistolik' => $data['tekanan_darah_sistolik'] ?? null,
+                'tekanan_darah_diastolik' => $data['tekanan_darah_diastolik'] ?? null,
+                'lila' => $data['lila'] ?? null,
+                'tinggi_fundus' => $data['tinggi_fundus'] ?? null,
+                'detak_jantung_janin' => $data['detak_jantung_janin'] ?? null,
+                'ttd_diberikan' => $request->boolean('ttd_diberikan'),
+                'jumlah_ttd' => $data['jumlah_ttd'] ?? null,
+                'imunisasi_tt' => $data['imunisasi_tt'] ?? '',
+                'catatan' => $data['catatan'] ?? '',
+            ];
+
+            DB::transaction(function () use ($correction, $existingRecord, $payload, $id) {
+                $audit = app(PemeriksaanAuditService::class);
+                if ($correction) {
+                    $before = $audit->snapshot($existingRecord);
+                    $existingRecord->update($payload + [
+                        'verification_status' => 'pending',
+                        'verified_by' => null,
+                        'verified_at' => null,
+                        'return_reason' => null,
+                    ]);
+                    $audit->record('ibu_hamil', $existingRecord, Auth::id(), 'edited', $before, 'Koreksi kader atas permintaan petugas.');
+                    return;
+                }
+
+                $record = PemeriksaanIbuHamil::create($payload + [
+                    'ibu_hamil_id' => $id,
+                    'submitted_by' => Auth::id(),
+                    'verification_status' => 'pending',
+                ]);
+                $audit->record('ibu_hamil', $record, Auth::id(), 'submitted');
+            });
+
+            return redirect()->route('ibu_hamil.periksa', $id)->with('success', $correction
+                ? 'Koreksi tersimpan dan dikirim kembali untuk verifikasi petugas.'
+                : 'Pemeriksaan tersimpan dan menunggu verifikasi petugas.');
+        }
+
+        $riwayat = PemeriksaanIbuHamil::where('ibu_hamil_id', $id)->orderByDesc('tanggal')->get();
+
+        return view('ibu_hamil.periksa', [
+            'ibu_hamil' => $ibuHamil,
+            'riwayat' => $riwayat,
+            'existingRecord' => $existingRecord,
+            'correction' => $correction,
+        ]);
     }
 }

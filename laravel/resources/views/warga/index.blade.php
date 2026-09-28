@@ -6,8 +6,8 @@
     <div class="card-body">
         <form method="get" class="row g-3">
             <div class="col-md-3">
-                <label class="form-label small fw-bold">Filter Kategori</label>
-                <select name="kategori" class="form-select">
+                <label for="warga-filter-kategori" class="form-label small fw-bold">Filter Kategori</label>
+                <select id="warga-filter-kategori" name="kategori" class="form-select">
                     <option value="">Semua Kategori</option>
                     <option value="Balita" @if($kategori == 'Balita')selected @endif>Bayi & Balita</option>
                     <option value="Ibu Hamil" @if($kategori == 'Ibu Hamil')selected @endif>Ibu Hamil & Nifas</option>
@@ -15,17 +15,19 @@
                 </select>
             </div>
             <div class="col-md-6">
-                <label class="form-label small fw-bold">Cari Nama / NIK</label>
+                <label for="warga-search" class="form-label small fw-bold">Cari Nama / NIK</label>
                 <div class="input-group">
-                    <input type="text" name="search" class="form-control" placeholder="Ketik nama atau NIK..." value="{{ request('search') }}">
+                    <input id="warga-search" type="text" name="search" class="form-control" placeholder="Ketik nama atau NIK..." value="{{ request('search') }}">
                     <button class="btn btn-outline-primary" type="submit"><i class="bi bi-search me-1"></i>Cari</button>
                 </div>
             </div>
-            <div class="col-md-3 d-flex align-items-end">
-                <a href="{{ url('/warga/tambah') }}" class="btn btn-primary w-100">
-                    <i class="bi bi-person-plus-fill me-2"></i>Tambah Warga Baru
-                </a>
-            </div>
+            @if(auth()->user()->role === 'petugas')
+                <div class="col-md-3 d-flex align-items-end">
+                    <a href="{{ route('warga.create') }}" class="btn btn-primary w-100">
+                        <i class="bi bi-person-plus-fill me-2" aria-hidden="true"></i>Tambah Warga Baru
+                    </a>
+                </div>
+            @endif
         </form>
     </div>
 </div>
@@ -96,12 +98,14 @@
                                 <a href="{{ url('/warga/'.$w->id) }}" class="btn btn-sm btn-outline-primary" title="Detail">
                                     <i class="bi bi-eye"></i>
                                 </a>
-                                <a href="{{ url('/warga/'.$w->id.'/edit') }}" class="btn btn-sm btn-outline-secondary" title="Edit">
-                                    <i class="bi bi-pencil-square"></i>
-                                </a>
-                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDelete({{ $w->id }})" title="Hapus">
-                                    <i class="bi bi-trash-fill"></i>
-                                </button>
+                                @if(auth()->user()->role === 'petugas')
+                                    <a href="{{ route('warga.edit', $w->id) }}" class="btn btn-sm btn-outline-secondary" title="Edit data warga" aria-label="Edit data {{ $w->nama_lengkap }}">
+                                        <i class="bi bi-pencil-square" aria-hidden="true"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDelete({{ $w->id }})" title="Hapus warga" aria-label="Hapus data {{ $w->nama_lengkap }}">
+                                        <i class="bi bi-trash-fill" aria-hidden="true"></i>
+                                    </button>
+                                @endif
                             </div>
                             @if($kategori == 'Balita' && $w->balita)
                                 <a href="{{ url('/balita/periksa/'.$w->balita->id) }}" class="btn btn-sm btn-info text-white ms-1" title="Periksa Balita">

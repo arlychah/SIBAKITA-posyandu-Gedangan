@@ -10,12 +10,12 @@
         body {
             background-color: #f8f9fa;
             min-height: 100vh;
-            overflow-x: hidden;
         }
         .sidebar {
             width: 260px;
             min-height: 100vh;
             background: linear-gradient(180deg, #1e3a8a 0%, #084298 100%);
+            z-index: 1040;
         }
         .sidebar .nav-link {
             color: rgba(255,255,255,0.85);
@@ -34,6 +34,7 @@
             display: inline-block;
         }
         .main-content {
+            min-width: 0;
             margin-left: 260px;
             padding: 24px;
         }
@@ -118,12 +119,82 @@
             font-weight: 700;
             font-size: 1.1rem;
         }
-        @media (max-width: 768px) {
+        @media (max-width: 767.98px) {
             .main-content {
+                width: 100%;
+                min-width: 0;
                 margin-left: 0;
+                padding: 16px;
             }
             .sidebar {
+                display: flex;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                width: min(84vw, 320px);
+                min-height: 100vh;
+                min-height: 100dvh;
+                height: 100vh;
+                height: 100dvh;
+                overflow-y: auto;
+                transform: translateX(-100%);
+                transition: transform 0.25s ease;
+                box-shadow: 0 12px 32px rgba(15, 23, 42, 0.24);
+            }
+            .sidebar.mobile-nav-open {
+                transform: translateX(0);
+            }
+            .mobile-nav-toggle {
+                display: inline-flex;
+                width: 44px;
+                height: 44px;
+                flex: 0 0 44px;
+                align-items: center;
+                justify-content: center;
+                padding: 0;
+            }
+            .mobile-nav-close {
+                position: absolute;
+                top: 12px;
+                right: 12px;
+                z-index: 1;
+                display: inline-flex;
+                width: 44px;
+                height: 44px;
+                align-items: center;
+                justify-content: center;
+                padding: 0;
+            }
+            .mobile-nav-backdrop {
+                position: fixed;
+                inset: 0;
+                z-index: 1030;
+                border: 0;
+                background: rgba(15, 23, 42, 0.48);
+            }
+            .mobile-nav-backdrop[hidden] {
                 display: none;
+            }
+            .page-header {
+                flex-wrap: nowrap;
+                align-items: flex-start;
+            }
+            .page-header__title-group {
+                min-width: 0;
+                flex: 1 1 auto;
+            }
+            .page-header__profile {
+                flex: 0 0 auto;
+            }
+            .main-content .row,
+            .main-content .card,
+            .main-content .table-responsive {
+                min-width: 0;
+                max-width: 100%;
+            }
+            .main-content .table-responsive {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
             }
         }
         .status-gizi-buruk { background-color: #ffe5e5; color: #b71c1c; }
@@ -134,7 +205,11 @@
 </head>
 <body>
     <div class="d-flex">
-        <nav class="sidebar position-fixed flex-column">
+        <button class="mobile-nav-backdrop" type="button" aria-label="Tutup menu navigasi" hidden></button>
+        <nav class="sidebar position-fixed flex-column" id="appSidebar" aria-label="Navigasi utama">
+            <button class="btn btn-sm btn-outline-light mobile-nav-close d-md-none" type="button" aria-label="Tutup menu navigasi">
+                <i class="bi bi-x-lg" aria-hidden="true"></i>
+            </button>
             <div class="p-4 text-white text-center border-bottom border-white-20">
                 <div class="mb-2">
                     <i class="bi bi-heart-pulse-fill" style="font-size: 40px;"></i>
@@ -143,53 +218,69 @@
                 <small class="text-white-50">Sistem Terintegrasi</small>
             </div>
             <div class="nav flex-column py-3">
-                <a href="{{ url('/') }}" class="nav-link">
+                @php($currentRole = Auth::user()->role)
+                <a href="{{ route('dashboard') }}" class="nav-link">
                     <i class="bi bi-speedometer2"></i> Dashboard
                 </a>
-                <h6 class="sidebar-heading text-white-50 px-4 mt-4 mb-2" style="font-size: 0.75rem; letter-spacing: 1px;">DATA WARGA</h6>
-                <a href="{{ url('/warga') }}" class="nav-link">
-                    <i class="bi bi-people-fill"></i> Daftar Warga
-                </a>
-                <a href="{{ url('/warga/tambah') }}" class="nav-link">
-                    <i class="bi bi-person-plus-fill"></i> Registrasi Warga
-                </a>
-                <h6 class="sidebar-heading text-white-50 px-4 mt-4 mb-2" style="font-size: 0.75rem; letter-spacing: 1px;">PELAYANAN</h6>
-                <div class="px-3 mb-1">
-                    <button class="btn btn-link text-white text-decoration-none w-100 text-start px-3 py-2" style="border-radius: 8px;" data-bs-toggle="collapse" data-bs-target="#pelayananMenu">
-                        <i class="bi bi-thermometer-half me-2" style="width: 24px; display: inline-block;"></i>Pelayanan <i class="bi bi-chevron-down float-end mt-1"></i>
-                    </button>
-                </div>
-                <div class="collapse" id="pelayananMenu">
-                    <a href="{{ url('/warga?kategori=Balita') }}" class="nav-link ms-3">
-                        <i class="bi bi-baby"></i> Input Pemeriksaan Balita
+
+                @if($currentRole === 'warga')
+                    <a href="{{ route('jadwal.index') }}" class="nav-link">
+                        <i class="bi bi-calendar-event"></i> Jadwal Posyandu
                     </a>
-                    <a href="{{ url('/warga?kategori=Ibu+Hamil') }}" class="nav-link ms-3">
-                        <i class="bi bi-person-pregnant"></i> Input Pemeriksaan Ibu Hamil
+                    <a href="{{ route('dashboard.anggota') }}#hasil-pemeriksaan" class="nav-link">
+                        <i class="bi bi-file-medical"></i> Hasil pemeriksaan
                     </a>
-                    <a href="{{ url('/warga?kategori=Lansia') }}" class="nav-link ms-3">
-                        <i class="bi bi-person-heart"></i> Input Pemeriksaan Lansia
+                @endif
+
+                @if(in_array($currentRole, ['kader', 'petugas'], true))
+                    <h6 class="sidebar-heading text-white-50 px-4 mt-4 mb-2" style="font-size: 0.75rem; letter-spacing: 1px;">DATA WARGA</h6>
+                    <a href="{{ route('warga.index') }}" class="nav-link">
+                        <i class="bi bi-people-fill"></i> Daftar Warga
                     </a>
-                </div>
-                <h6 class="sidebar-heading text-white-50 px-4 mt-4 mb-2" style="font-size: 0.75rem; letter-spacing: 1px;">PELAPORAN</h6>
-                <div class="px-3 mb-1">
-                    <button class="btn btn-link text-white text-decoration-none w-100 text-start px-3 py-2" style="border-radius: 8px;" data-bs-toggle="collapse" data-bs-target="#laporanMenu">
-                        <i class="bi bi-bar-chart-line-fill me-2" style="width: 24px; display: inline-block;"></i>Pelaporan <i class="bi bi-chevron-down float-end mt-1"></i>
-                    </button>
-                </div>
-                <div class="collapse" id="laporanMenu">
-                    <a href="{{ url('/laporan') }}" class="nav-link ms-3">
-                        <i class="bi bi-file-earmark-text"></i> Rekap Semua
+                @endif
+
+                @if($currentRole === 'petugas')
+                    <a href="{{ route('warga.create') }}" class="nav-link">
+                        <i class="bi bi-person-plus-fill"></i> Registrasi Warga
                     </a>
-                    <a href="{{ url('/laporan/balita') }}" class="nav-link ms-3">
-                        <i class="bi bi-baby"></i> Laporan Balita
+                    <h6 class="sidebar-heading text-white-50 px-4 mt-4 mb-2" style="font-size: 0.75rem; letter-spacing: 1px;">TINJAUAN</h6>
+                    <a href="{{ route('verifikasi.index') }}" class="nav-link">
+                        <i class="bi bi-clipboard-check"></i> Verifikasi pemeriksaan
                     </a>
-                    <a href="{{ url('/laporan/ibu_hamil') }}" class="nav-link ms-3">
-                        <i class="bi bi-person-pregnant"></i> Laporan Ibu Hamil
+                    <a href="{{ route('jadwal.index') }}" class="nav-link">
+                        <i class="bi bi-calendar-event"></i> Jadwal Posyandu
                     </a>
-                    <a href="{{ url('/laporan/lansia') }}" class="nav-link ms-3">
-                        <i class="bi bi-person-heart"></i> Laporan Lansia
+                @endif
+
+                @if($currentRole === 'kader')
+                    <h6 class="sidebar-heading text-white-50 px-4 mt-4 mb-2" style="font-size: 0.75rem; letter-spacing: 1px;">INPUT PEMERIKSAAN</h6>
+                    <a href="{{ route('dashboard.kader') }}?kategori=balita" class="nav-link"><i class="bi bi-baby"></i> Balita</a>
+                    <a href="{{ route('dashboard.kader') }}?kategori=ibu_hamil" class="nav-link"><i class="bi bi-person-pregnant"></i> Ibu hamil</a>
+                    <a href="{{ route('dashboard.kader') }}?kategori=lansia" class="nav-link"><i class="bi bi-person-heart"></i> Lansia</a>
+                @endif
+
+                @if(in_array($currentRole, ['admin', 'petugas'], true))
+                    <h6 class="sidebar-heading text-white-50 px-4 mt-4 mb-2" style="font-size: 0.75rem; letter-spacing: 1px;">AKUN</h6>
+                    <a href="{{ route('akun-anggota.index') }}" class="nav-link">
+                        <i class="bi bi-person-vcard"></i> Akun anggota
                     </a>
-                </div>
+                @endif
+
+                @if($currentRole === 'petugas')
+                    <h6 class="sidebar-heading text-white-50 px-4 mt-4 mb-2" style="font-size: 0.75rem; letter-spacing: 1px;">PELAPORAN</h6>
+                    <div class="px-3 mb-1">
+                        <button class="btn btn-link text-white text-decoration-none w-100 text-start px-3 py-2" style="border-radius: 8px;" data-bs-toggle="collapse" data-bs-target="#laporanMenu" aria-expanded="false" aria-controls="laporanMenu">
+                            <i class="bi bi-bar-chart-line-fill me-2" style="width: 24px; display: inline-block;"></i>Laporan <i class="bi bi-chevron-down float-end mt-1"></i>
+                        </button>
+                    </div>
+                    <div class="collapse" id="laporanMenu">
+                        <a href="{{ route('laporan.index') }}" class="nav-link ms-3"><i class="bi bi-file-earmark-text"></i> Rekap semua</a>
+                        <a href="{{ route('laporan.balita') }}" class="nav-link ms-3"><i class="bi bi-baby"></i> Laporan Balita</a>
+                        <a href="{{ route('laporan.ibu-hamil') }}" class="nav-link ms-3"><i class="bi bi-person-pregnant"></i> Laporan Ibu Hamil</a>
+                        <a href="{{ route('laporan.lansia') }}" class="nav-link ms-3"><i class="bi bi-person-heart"></i> Laporan Lansia</a>
+                    </div>
+                @endif
+
                 <div class="mx-3 mt-4 p-3 rounded-3" style="background: rgba(255,255,255,0.10); backdrop-filter: blur(6px);">
                     <div class="d-flex align-items-center mb-2">
                         <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center me-2 shadow-sm" style="width: 38px; height: 38px;">
@@ -220,13 +311,18 @@
             </div>
         </nav>
         <main class="main-content flex-grow-1">
-            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2" style="padding-top: 16px;">
-                <div>
-                    <h4 class="mb-0 text-primary">
-                        <i class="bi bi-chevron-right me-2"></i>@yield('page_title', 'Dashboard')
-                    </h4>
+            <div class="page-header d-flex justify-content-between align-items-center mb-4 gap-2" style="padding-top: 16px;">
+                <div class="page-header__title-group d-flex align-items-center gap-2">
+                    <button class="btn btn-primary mobile-nav-toggle d-md-none" id="mobileNavToggle" type="button" aria-controls="appSidebar" aria-expanded="false" aria-label="Buka menu navigasi">
+                        <i class="bi bi-list fs-4" aria-hidden="true"></i>
+                    </button>
+                    <div>
+                        <h4 class="mb-0 text-primary">
+                            <i class="bi bi-chevron-right me-2"></i>@yield('page_title', 'Dashboard')
+                        </h4>
+                    </div>
                 </div>
-                <div class="d-flex align-items-center">
+                <div class="page-header__profile d-flex align-items-center">
                     <span class="text-muted me-3 small d-none d-md-inline">
                         <i class="bi bi-calendar-event-fill"></i>
                         @php
@@ -298,5 +394,69 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     @stack('extra_js')
+    <script>
+        (function () {
+            const sidebar = document.getElementById('appSidebar');
+            const toggle = document.getElementById('mobileNavToggle');
+            const backdrop = document.querySelector('.mobile-nav-backdrop');
+            const closeButton = sidebar && sidebar.querySelector('.mobile-nav-close');
+
+            if (!sidebar || !toggle || !backdrop || !closeButton) return;
+
+            const mobileViewport = window.matchMedia('(max-width: 767.98px)');
+
+            function closeNavigation(returnFocus) {
+                sidebar.classList.remove('mobile-nav-open');
+                backdrop.hidden = true;
+                toggle.setAttribute('aria-expanded', 'false');
+                toggle.setAttribute('aria-label', 'Buka menu navigasi');
+                document.body.style.overflow = '';
+
+                if (mobileViewport.matches) {
+                    sidebar.setAttribute('aria-hidden', 'true');
+                    sidebar.setAttribute('inert', '');
+                }
+
+                if (returnFocus && mobileViewport.matches) toggle.focus();
+            }
+
+            function openNavigation() {
+                if (!mobileViewport.matches) return;
+
+                sidebar.removeAttribute('inert');
+                sidebar.setAttribute('aria-hidden', 'false');
+                sidebar.classList.add('mobile-nav-open');
+                backdrop.hidden = false;
+                toggle.setAttribute('aria-expanded', 'true');
+                toggle.setAttribute('aria-label', 'Tutup menu navigasi');
+                document.body.style.overflow = 'hidden';
+                closeButton.focus();
+            }
+
+            function syncNavigationState() {
+                closeNavigation(false);
+                if (!mobileViewport.matches) {
+                    sidebar.removeAttribute('aria-hidden');
+                    sidebar.removeAttribute('inert');
+                }
+            }
+
+            toggle.addEventListener('click', openNavigation);
+            closeButton.addEventListener('click', function () { closeNavigation(true); });
+            backdrop.addEventListener('click', function () { closeNavigation(true); });
+            sidebar.querySelectorAll('a').forEach(function (link) {
+                link.addEventListener('click', function () {
+                    if (mobileViewport.matches) closeNavigation(false);
+                });
+            });
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape' && sidebar.classList.contains('mobile-nav-open')) {
+                    closeNavigation(true);
+                }
+            });
+            mobileViewport.addEventListener('change', syncNavigationState);
+            syncNavigationState();
+        })();
+    </script>
 </body>
 </html>

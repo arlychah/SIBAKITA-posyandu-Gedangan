@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Warga extends Model
 {
@@ -83,5 +84,22 @@ class Warga extends Model
     public function lansia(): HasOne
     {
         return $this->hasOne(Lansia::class, 'warga_id');
+    }
+
+    public function user(): HasOne
+    {
+        return $this->hasOne(User::class, 'warga_id');
+    }
+
+    public function kategoriJadwal(): string
+    {
+        $kategori = strtolower(str_replace(' ', '_', trim((string) $this->kategori)));
+
+        return match ($kategori) {
+            'balita' => 'balita',
+            'ibu_hamil', 'ibu_hamil_nifas' => 'ibu_hamil',
+            'lansia' => 'lansia',
+            default => '',
+        };
     }
 }

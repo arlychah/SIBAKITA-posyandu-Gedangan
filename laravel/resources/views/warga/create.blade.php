@@ -19,6 +19,12 @@
             <form method="post" action="{{ url('/warga/tambah') }}">
                 @csrf
                 <div class="card-body">
+                    @if($errors->any())
+                        <div class="alert alert-danger" role="alert" aria-labelledby="warga-error-heading">
+                            <strong id="warga-error-heading">Data belum tersimpan. Periksa kembali:</strong>
+                            <ul class="mb-0">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
+                        </div>
+                    @endif
                     <div class="card mb-4 border">
                         <div class="card-header bg-light">
                             <h6 class="mb-0 text-primary"><i class="bi bi-credit-card-2-front-fill me-2"></i>Data Identitas Dasar</h6>
@@ -26,32 +32,32 @@
                         <div class="card-body">
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold">NIK (Nomor Induk Kependudukan) <span class="text-danger">*</span></label>
-                                    <input type="text" name="nik" maxlength="16" required class="form-control" placeholder="16 digit NIK" pattern="[0-9]{16}" title="Harus 16 digit angka" value="{{ old('nik') }}">
+                                    <label for="warga-nik" class="form-label fw-bold">NIK (Nomor Induk Kependudukan) <span class="text-danger">*</span></label>
+                                    <input id="warga-nik" type="text" name="nik" maxlength="16" required class="form-control" placeholder="16 digit NIK" pattern="[0-9]{16}" title="Harus 16 digit angka" value="{{ old('nik') }}">
                                     <small class="text-muted"><i class="bi bi-info-circle me-1"></i>Validasi wajib untuk integrasi database nasional SATUSEHAT</small>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold">Nama Lengkap <span class="text-danger">*</span></label>
-                                    <input type="text" name="nama_lengkap" required class="form-control" placeholder="Nama sesuai KTP / KK" value="{{ old('nama_lengkap') }}">
+                                    <label for="warga-nama-lengkap" class="form-label fw-bold">Nama Lengkap <span class="text-danger">*</span></label>
+                                    <input id="warga-nama-lengkap" type="text" name="nama_lengkap" required class="form-control" placeholder="Nama sesuai KTP / KK" value="{{ old('nama_lengkap') }}">
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="form-label fw-bold">Jenis Kelamin <span class="text-danger">*</span></label>
-                                    <select name="jenis_kelamin" required class="form-select">
+                                    <label for="warga-jenis-kelamin" class="form-label fw-bold">Jenis Kelamin <span class="text-danger">*</span></label>
+                                    <select id="warga-jenis-kelamin" name="jenis_kelamin" required class="form-select">
                                         <option value="">-- Pilih --</option>
                                         <option value="Laki-laki" @selected(old('jenis_kelamin')=='Laki-laki')>Laki-laki</option>
                                         <option value="Perempuan" @selected(old('jenis_kelamin')=='Perempuan')>Perempuan</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="form-label fw-bold">Tempat Lahir</label>
-                                    <input type="text" name="tempat_lahir" class="form-control" placeholder="Nama Kota/Kabupaten" value="{{ old('tempat_lahir') }}">
+                                    <label for="warga-tempat-lahir" class="form-label fw-bold">Tempat Lahir</label>
+                                    <input id="warga-tempat-lahir" type="text" name="tempat_lahir" class="form-control" placeholder="Nama Kota/Kabupaten" value="{{ old('tempat_lahir') }}">
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="form-label fw-bold">Tanggal Lahir <span class="text-danger">*</span></label>
-                                    <input type="date" name="tanggal_lahir" required class="form-control" max="{{ date('Y-m-d') }}" value="{{ old('tanggal_lahir') }}">
+                                    <label for="warga-tanggal-lahir" class="form-label fw-bold">Tanggal Lahir <span class="text-danger">*</span></label>
+                                    <input id="warga-tanggal-lahir" type="date" name="tanggal_lahir" required class="form-control" max="{{ date('Y-m-d') }}" value="{{ old('tanggal_lahir') }}">
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="form-label fw-bold">Kategori Posyandu <span class="text-danger">*</span></label>
+                                    <label for="kategoriSelect" class="form-label fw-bold">Kategori Posyandu <span class="text-danger">*</span></label>
                                     <select name="kategori" required class="form-select" id="kategoriSelect">
                                         <option value="">-- Pilih Kategori --</option>
                                         <option value="Balita" @selected(old('kategori')=='Balita')>Bayi & Balita (0-5 Tahun)</option>
@@ -60,16 +66,16 @@
                                     </select>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold">Nomor WhatsApp <span class="text-danger">*</span></label>
+                                    <label for="warga-whatsapp" class="form-label fw-bold">Nomor WhatsApp <span class="text-danger">*</span></label>
                                     <div class="input-group">
-                                        <span class="input-group-text bg-success text-white"><i class="bi bi-whatsapp"></i></span>
-                                        <input type="tel" name="whatsapp" required class="form-control" placeholder="contoh: 6281234567890" pattern="[0-9]{10,15}" title="Hanya angka, 10-15 digit" value="{{ old('whatsapp') }}">
+                                        <span class="input-group-text bg-success text-white" aria-hidden="true"><i class="bi bi-whatsapp"></i></span>
+                                        <input id="warga-whatsapp" type="tel" name="whatsapp" required class="form-control" placeholder="contoh: 6281234567890" pattern="[0-9]{10,15}" title="Hanya angka, 10-15 digit" value="{{ old('whatsapp') }}">
                                     </div>
                                     <small class="text-muted"><i class="bi bi-chat-dots me-1"></i>Untuk komunikasi & notifikasi WhatsApp Chatbot</small>
                                 </div>
                                 <div class="col-md-12">
-                                    <label class="form-label fw-bold">Alamat Domisili</label>
-                                    <textarea name="alamat" rows="2" class="form-control" placeholder="RT/RW, Dusun, Desa/Kelurahan">{{ old('alamat') }}</textarea>
+                                    <label for="warga-alamat" class="form-label fw-bold">Alamat Domisili</label>
+                                    <textarea id="warga-alamat" name="alamat" rows="2" class="form-control" placeholder="RT/RW, Dusun, Desa/Kelurahan">{{ old('alamat') }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -81,8 +87,8 @@
                         <div class="card-body">
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold">Puskesmas Domisili <span class="text-danger">*</span></label>
-                                    <select name="puskesmas" required class="form-select">
+                                    <label for="warga-puskesmas" class="form-label fw-bold">Puskesmas Domisili <span class="text-danger">*</span></label>
+                                    <select id="warga-puskesmas" name="puskesmas" required class="form-select">
                                         <option value="">-- Pilih Puskesmas --</option>
                                         <option @selected(old('puskesmas')=='Puskesmas Kecamatan A')>Puskesmas Kecamatan A</option>
                                         <option @selected(old('puskesmas')=='Puskesmas Kecamatan B')>Puskesmas Kecamatan B</option>
@@ -93,40 +99,40 @@
                                     <small class="text-muted"><i class="bi bi-buildings me-1"></i>Menentukan wilayah kerja & Faskes rujukan level 1</small>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold">Pustu / Posyandu Domisili <span class="text-danger">*</span></label>
-                                    <input type="text" name="pustu" required class="form-control" placeholder="Nama Pustu / Posyandu" value="{{ old('pustu') }}">
+                                    <label for="warga-pustu" class="form-label fw-bold">Pustu / Posyandu Domisili <span class="text-danger">*</span></label>
+                                    <input id="warga-pustu" type="text" name="pustu" required class="form-control" placeholder="Nama Pustu / Posyandu" value="{{ old('pustu') }}">
                                     <small class="text-muted"><i class="bi bi-house-heart me-1"></i>Tempat pelaporan data & lokasi pelayanan</small>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div id="extraFields">
-                        <div class="card border balita-field" style="@if(old('kategori') != 'Balita') display:none; @endif">
+                        <div class="card border balita-field" style="@if(old('kategori') != 'Balita') display:none; @endif" aria-hidden="{{ old('kategori') === 'Balita' ? 'false' : 'true' }}">
                             <div class="card-header bg-info text-white">
                                 <h6 class="mb-0"><i class="bi bi-baby me-2"></i>Data Orang Tua (Untuk Kategori Balita)</h6>
                             </div>
                             <div class="card-body">
                                 <div class="row g-3">
                                     <div class="col-md-6">
-                                        <label class="form-label fw-bold">Nama Ibu</label>
-                                        <input type="text" name="nama_ibu" class="form-control" placeholder="Nama Ibu Kandung" value="{{ old('nama_ibu') }}">
+                                        <label for="warga-nama-ibu" class="form-label fw-bold">Nama Ibu</label>
+                                        <input id="warga-nama-ibu" type="text" name="nama_ibu" class="form-control" placeholder="Nama Ibu Kandung" value="{{ old('nama_ibu') }}">
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label fw-bold">Nama Ayah</label>
-                                        <input type="text" name="nama_ayah" class="form-control" placeholder="Nama Ayah Kandung" value="{{ old('nama_ayah') }}">
+                                        <label for="warga-nama-ayah" class="form-label fw-bold">Nama Ayah</label>
+                                        <input id="warga-nama-ayah" type="text" name="nama_ayah" class="form-control" placeholder="Nama Ayah Kandung" value="{{ old('nama_ayah') }}">
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="card border ibu-hamil-field mt-4" style="@if(old('kategori') != 'Ibu Hamil') display:none; @endif">
+                        <div class="card border ibu-hamil-field mt-4" style="@if(old('kategori') != 'Ibu Hamil') display:none; @endif" aria-hidden="{{ old('kategori') === 'Ibu Hamil' ? 'false' : 'true' }}">
                             <div class="card-header bg-warning">
                                 <h6 class="mb-0"><i class="bi bi-person-pregnant me-2"></i>Data Suami (Untuk Kategori Ibu Hamil)</h6>
                             </div>
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <label class="form-label fw-bold">Nama Suami</label>
-                                        <input type="text" name="nama_suami" class="form-control" placeholder="Nama Lengkap Suami" value="{{ old('nama_suami') }}">
+                                        <label for="warga-nama-suami" class="form-label fw-bold">Nama Suami</label>
+                                        <input id="warga-nama-suami" type="text" name="nama_suami" class="form-control" placeholder="Nama Lengkap Suami" value="{{ old('nama_suami') }}">
                                     </div>
                                 </div>
                             </div>

@@ -46,9 +46,10 @@
                     </div>
                 </div>
             </div>
-            <form method="POST" action="{{ url("/ibu_hamil/periksa/{$ibu_hamil->id}") }}">
+            <form method="POST" action="{{ $correction ? route('ibu_hamil.periksa.koreksi.update', [$ibuHamil->id, $existingRecord->id]) : route('ibu_hamil.periksa.store', $ibuHamil->id) }}">
                 @csrf
                 <div class="card-body">
+                    @if($correction)<div class="alert alert-warning" role="status"><strong>Perlu perbaikan:</strong> {{ $existingRecord->return_reason }}</div>@endif
                     <div class="card mb-4 border">
                         <div class="card-header bg-light">
                             <h6 class="mb-0 text-warning"><i class="bi bi-calendar-week me-2"></i>Identitas Pemeriksaan</h6>
@@ -56,16 +57,16 @@
                         <div class="card-body">
                             <div class="row g-3">
                                 <div class="col-md-4">
-                                    <label class="form-label fw-bold">Tanggal Pemeriksaan</label>
-                                    <input type="date" name="tanggal" class="form-control" value="{{ date('Y-m-d') }}">
+                                    <label for="anc-tanggal" class="form-label fw-bold">Tanggal Pemeriksaan</label>
+                                    <input id="anc-tanggal" type="date" name="tanggal" class="form-control" required value="{{ old('tanggal', $existingRecord?->tanggal?->format('Y-m-d') ?? date('Y-m-d')) }}">
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label fw-bold">Kehamilan Ke-</label>
-                                    <input type="number" name="kehamilan_ke" min="1" max="10" class="form-control" placeholder="contoh: 1">
+                                    <label for="anc-kehamilan-ke" class="form-label fw-bold">Kehamilan Ke-</label>
+                                    <input id="anc-kehamilan-ke" type="number" name="kehamilan_ke" min="1" max="10" class="form-control" placeholder="contoh: 1" value="{{ old('kehamilan_ke', $existingRecord?->kehamilan_ke) }}">
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label fw-bold">Usia Kehamilan (Minggu)</label>
-                                    <input type="number" name="usia_kehamilan" min="1" max="42" class="form-control" placeholder="contoh: 28">
+                                    <label for="anc-usia-kehamilan" class="form-label fw-bold">Usia Kehamilan (Minggu)</label>
+                                    <input id="anc-usia-kehamilan" type="number" name="usia_kehamilan" min="1" max="42" class="form-control" placeholder="contoh: 28" value="{{ old('usia_kehamilan', $existingRecord?->usia_kehamilan) }}">
                                 </div>
                             </div>
                         </div>
@@ -77,31 +78,31 @@
                         <div class="card-body">
                             <div class="row g-3">
                                 <div class="col-md-3">
-                                    <label class="form-label fw-bold">Berat Badan (kg)</label>
-                                    <input type="number" step="0.1" name="berat_badan" class="form-control" placeholder="contoh: 65.5">
+                                    <label for="anc-berat" class="form-label fw-bold">Berat Badan (kg)</label>
+                                    <input id="anc-berat" type="number" step="0.1" name="berat_badan" class="form-control" placeholder="contoh: 65.5" value="{{ old('berat_badan', $existingRecord?->berat_badan) }}">
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="form-label fw-bold">Tinggi Fundus (cm)</label>
-                                    <input type="number" step="0.5" name="tinggi_fundus" class="form-control" placeholder="contoh: 28">
+                                    <label for="anc-tinggi-fundus" class="form-label fw-bold">Tinggi Fundus (cm)</label>
+                                    <input id="anc-tinggi-fundus" type="number" step="0.5" name="tinggi_fundus" class="form-control" placeholder="contoh: 28" value="{{ old('tinggi_fundus', $existingRecord?->tinggi_fundus) }}">
                                 </div>
                                 <div class="col-md-2">
-                                    <label class="form-label fw-bold">TD Sistolik</label>
-                                    <input type="number" name="tekanan_darah_sistolik" class="form-control" placeholder="120">
+                                    <label for="anc-td-sistolik" class="form-label fw-bold">TD Sistolik</label>
+                                    <input id="anc-td-sistolik" type="number" name="tekanan_darah_sistolik" class="form-control" placeholder="120" value="{{ old('tekanan_darah_sistolik', $existingRecord?->tekanan_darah_sistolik) }}">
                                     <small class="text-muted">mmHg</small>
                                 </div>
                                 <div class="col-md-2">
-                                    <label class="form-label fw-bold">TD Diastolik</label>
-                                    <input type="number" name="tekanan_darah_diastolik" class="form-control" placeholder="80">
+                                    <label for="anc-td-diastolik" class="form-label fw-bold">TD Diastolik</label>
+                                    <input id="anc-td-diastolik" type="number" name="tekanan_darah_diastolik" class="form-control" placeholder="80" value="{{ old('tekanan_darah_diastolik', $existingRecord?->tekanan_darah_diastolik) }}">
                                     <small class="text-muted">mmHg</small>
                                 </div>
                                 <div class="col-md-2">
-                                    <label class="form-label fw-bold">LILA (cm)</label>
-                                    <input type="number" step="0.1" name="lila" class="form-control" placeholder="contoh: 25.5">
+                                    <label for="anc-lila" class="form-label fw-bold">LILA (cm)</label>
+                                    <input id="anc-lila" type="number" step="0.1" name="lila" class="form-control" placeholder="contoh: 25.5" value="{{ old('lila', $existingRecord?->lila) }}">
                                     <small class="text-danger">Deteksi KEK: < 23.5</small>
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="form-label fw-bold">Detak Jantung Janin (x/menit)</label>
-                                    <input type="number" name="detak_jantung_janin" min="100" max="180" class="form-control" placeholder="140">
+                                    <label for="anc-djj" class="form-label fw-bold">Detak Jantung Janin (x/menit)</label>
+                                    <input id="anc-djj" type="number" name="detak_jantung_janin" min="50" max="250" class="form-control" placeholder="140" value="{{ old('detak_jantung_janin', $existingRecord?->detak_jantung_janin) }}">
                                 </div>
                             </div>
                         </div>
@@ -114,29 +115,26 @@
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <div class="form-check form-switch">
-                                        <input class="form-check-input form-switch" type="checkbox" name="ttd_diberikan" id="ttd">
-                                        <label class="form-check-label fw-bold" for="ttd">Tablet Tambah Darah (TTD) Diberikan</label>
+                                        <input class="form-check-input form-switch" type="checkbox" name="ttd_diberikan" value="1" id="anc-ttd" @checked(old('ttd_diberikan', $existingRecord?->ttd_diberikan))>
+                                        <label class="form-check-label fw-bold" for="anc-ttd">Tablet Tambah Darah (TTD) Diberikan</label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold">Jumlah Butir TTD</label>
-                                    <input type="number" name="jumlah_ttd" class="form-control" placeholder="contoh: 30">
+                                    <label for="anc-jumlah-ttd" class="form-label fw-bold">Jumlah Butir TTD</label>
+                                    <input id="anc-jumlah-ttd" type="number" name="jumlah_ttd" class="form-control" placeholder="contoh: 30" value="{{ old('jumlah_ttd', $existingRecord?->jumlah_ttd) }}">
                                 </div>
                                 <div class="col-md-12">
-                                    <label class="form-label fw-bold">Imunisasi Tetanus Toksoid (TT)</label>
-                                    <select name="imunisasi_tt" class="form-select">
+                                    <label for="anc-imunisasi-tt" class="form-label fw-bold">Imunisasi Tetanus Toksoid (TT)</label>
+                                    <select id="anc-imunisasi-tt" name="imunisasi_tt" class="form-select">
                                         <option value="">-- Belum / Tidak --</option>
-                                        <option>TT1</option>
-                                        <option>TT2</option>
-                                        <option>TT3</option>
-                                        <option>TT4</option>
-                                        <option>TT5</option>
-                                        <option>Td (Ulang)</option>
+                                        @foreach(['TT1', 'TT2', 'TT3', 'TT4', 'TT5', 'Td (Ulang)'] as $ttOption)
+                                            <option value="{{ $ttOption }}" @selected(old('imunisasi_tt', $existingRecord?->imunisasi_tt) === $ttOption)>{{ $ttOption }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                                 <div class="col-md-12">
-                                    <label class="form-label fw-bold">Catatan Konseling / Rujukan / Tanda Bahaya</label>
-                                    <textarea name="catatan" rows="2" class="form-control" placeholder="Rujukan ke Puskesmas/Kasus BBLR/Perdarahan dll"></textarea>
+                                    <label for="anc-catatan" class="form-label fw-bold">Catatan Konseling / Rujukan / Tanda Bahaya</label>
+                                    <textarea id="anc-catatan" name="catatan" rows="2" class="form-control" placeholder="Rujukan ke Puskesmas/Kasus BBLR/Perdarahan dll">{{ old('catatan', $existingRecord?->catatan) }}</textarea>
                                 </div>
                             </div>
                         </div>

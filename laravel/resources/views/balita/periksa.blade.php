@@ -13,8 +13,11 @@
                 <small>{{ $balita->warga->nik }}</small>
                 <div class="mt-3">
                     <span class="badge bg-white bg-opacity-25 me-1">
-                        @if($umur_tahun > 0){{ $umur_tahun }} Th {{ $umur_bulan % 12 }} Bln
-                        @else{{ $umur_bulan }} Bulan@endif
+                    @if ($umur_tahun > 0)
+                            {{ $umur_tahun }} Th {{ $umur_bulan % 12 }} Bln
+                        @else
+                            {{ $umur_bulan }} Bulan
+                        @endif
                     </span>
                     <span class="badge bg-white bg-opacity-25">{{ $balita->warga->jenis_kelamin }}</span>
                 </div>
@@ -46,9 +49,12 @@
                     </div>
                 </div>
             </div>
-            <form method="POST" action="{{ url("/balita/periksa/{$balita->id}") }}">
+            <form method="POST" action="{{ $correction ? route('balita.periksa.koreksi.update', [$balita->id, $existingRecord->id]) : route('balita.periksa.store', $balita->id) }}">
                 @csrf
                 <div class="card-body">
+                    @if($correction)
+                        <div class="alert alert-warning" role="status"><strong>Perlu perbaikan:</strong> {{ $existingRecord->return_reason }}</div>
+                    @endif
                     <div class="card mb-4 border">
                         <div class="card-header bg-light">
                             <h6 class="mb-0 text-info"><i class="bi bi-rulers me-2"></i>Parameter Pengukuran Antropometri</h6>
@@ -56,24 +62,35 @@
                         <div class="card-body">
                             <div class="row g-3">
                                 <div class="col-md-3">
-                                    <label class="form-label fw-bold">Tanggal Pemeriksaan</label>
-                                    <input type="date" name="tanggal" class="form-control" value="{{ date('Y-m-d') }}" max="{{ date('Y-m-d') }}">
+                                    <label for="balita-tanggal" class="form-label fw-bold">Tanggal Pemeriksaan</label>
+                                    <input id="balita-tanggal" type="date" name="tanggal" class="form-control" value="{{ old('tanggal', $existingRecord?->tanggal?->format('Y-m-d') ?? date('Y-m-d')) }}" max="{{ date('Y-m-d') }}" required>
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="form-label fw-bold">Berat Badan (kg) <span class="text-danger">*</span></label>
-                                    <input type="number" step="0.01" name="berat_badan" required class="form-control" placeholder="contoh: 12.5">
+                                    <label for="balita-berat" class="form-label fw-bold">Berat Badan (kg) <span class="text-danger">*</span></label>
+                                    <input id="balita-berat" type="number" step="0.01" name="berat_badan" required class="form-control" placeholder="contoh: 12.5" value="{{ old('berat_badan', $existingRecord?->berat_badan) }}" aria-describedby="balita-berat-hint">
+                                    <small class="form-text" id="balita-berat-hint">Gunakan kilogram.</small>
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="form-label fw-bold">Tinggi Badan (cm) <span class="text-danger">*</span></label>
-                                    <input type="number" step="0.1" name="tinggi_badan" required class="form-control" placeholder="contoh: 90.5">
+                                    <label for="balita-stature" class="form-label fw-bold">Panjang / Tinggi (cm) <span class="text-danger">*</span></label>
+                                    <input id="balita-stature" type="number" step="0.1" name="tinggi_badan" required class="form-control" placeholder="contoh: 90.5" value="{{ old('tinggi_badan', $existingRecord?->tinggi_badan) }}" aria-describedby="balita-stature-hint">
+                                    <small class="form-text" id="balita-stature-hint">Panjang berbaring untuk acuan usia &lt;24 bulan; tinggi berdiri untuk usia ≥24 bulan. WHO menyesuaikan beda posisi ukur sebesar 0,7 cm.</small>
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="form-label fw-bold">Lingkar Kepala (cm)</label>
-                                    <input type="number" step="0.1" name="lingkar_kepala" class="form-control" placeholder="contoh: 48.2">
+                                    <label for="balita-lingkar-kepala" class="form-label fw-bold">Lingkar Kepala (cm)</label>
+                                    <input id="balita-lingkar-kepala" type="number" step="0.1" name="lingkar_kepala" class="form-control" placeholder="contoh: 48.2" value="{{ old('lingkar_kepala', $existingRecord?->lingkar_kepala) }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="balita-metode-ukur" class="form-label fw-bold">Metode pengukuran</label>
+                                    <select id="balita-metode-ukur" name="metode_pengukuran" class="form-select" required aria-describedby="balita-metode-hint">
+                                        <option value="">Pilih metode pengukuran</option>
+                                        <option value="standing" @selected(old('metode_pengukuran', $existingRecord?->metode_pengukuran) === 'standing')>Berdiri (tinggi badan)</option>
+                                        <option value="recumbent" @selected(old('metode_pengukuran', $existingRecord?->metode_pengukuran) === 'recumbent')>Berbaring (panjang badan)</option>
+                                    </select>
+                                    <small class="form-text" id="balita-metode-hint">Pilih sesuai posisi anak saat pengukuran; sistem menerapkan koreksi posisi WHO 0,7 cm bila diperlukan.</small>
                                 </div>
                             </div>
                             <div class="alert alert-info mt-3 mb-0 small border-0">
-                                <i class="bi bi-lightbulb me-2"></i><strong>Status gizi otomatis dihitung</strong>: BB/U (Z-Score), TB/U (Z-Score), dan BB/TB berdasarkan Kurva Pertumbuhan WHO 2006 & Standar Kemenkes RI.
+                                <i class="bi bi-info-circle me-2" aria-hidden="true"></i><strong>BB/TB dihitung dengan metode LMS standar WHO 2006.</strong> Rujukan WFL digunakan sebelum 24 bulan dan WFH mulai 24 bulan; hasil di luar rentang tabel ditandai untuk evaluasi petugas.
                             </div>
                         </div>
                     </div>
@@ -84,8 +101,8 @@
                         <div class="card-body">
                             <div class="row g-3 mb-4">
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold">Pemberian ASI Eksklusif</label>
-                                    <select name="asi_eksklusif" class="form-select">
+                                    <label for="balita-asi" class="form-label fw-bold">Pemberian ASI Eksklusif</label>
+                                    <select id="balita-asi" name="asi_eksklusif" class="form-select">
                                         <option value="">-- Pilih --</option>
                                         <option>Ya, Eksklusif 0-6 Bln</option>
                                         <option>Sebagian (MP-ASI)</option>
@@ -94,8 +111,8 @@
                                     </select>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold">Pemberian Vitamin A (Bulan ke-)</label>
-                                    <select name="vitamin_a_bulan_ke" class="form-select">
+                                    <label for="balita-vitamin-a" class="form-label fw-bold">Pemberian Vitamin A (Bulan ke-)</label>
+                                    <select id="balita-vitamin-a" name="vitamin_a_bulan_ke" class="form-select">
                                         <option value="">Tidak Diberikan</option>
                                         <option value="1">Vit A Bulan Ke-1</option>
                                         <option value="2">Vit A Bulan Ke-2</option>
@@ -107,17 +124,20 @@
                                     </select>
                                 </div>
                             </div>
-                            <label class="form-label fw-bold mb-2 d-block"><i class="bi bi-syringe me-2"></i>Riwayat Imunisasi Rutin (Centang bila sudah)</label>
-                            <div class="row g-2">
-                                <div class="col-md-4"><div class="form-check form-switch"><input class="form-check-input form-switch" type="checkbox" name="imunisasi_bcg"><label class="form-check-label fw-bold">BCG</label></div></div>
-                                <div class="col-md-4"><div class="form-check form-switch"><input class="form-check-input form-switch" type="checkbox" name="imunisasi_polio1"><label class="form-check-label fw-bold">Polio 1</label></div></div>
-                                <div class="col-md-4"><div class="form-check form-switch"><input class="form-check-input form-switch" type="checkbox" name="imunisasi_polio2"><label class="form-check-label fw-bold">Polio 2</label></div></div>
-                                <div class="col-md-4"><div class="form-check form-switch"><input class="form-check-input form-switch" type="checkbox" name="imunisasi_polio3"><label class="form-check-label fw-bold">Polio 3</label></div></div>
-                                <div class="col-md-4"><div class="form-check form-switch"><input class="form-check-input form-switch" type="checkbox" name="imunisasi_dpt1"><label class="form-check-label fw-bold">DPT-HB-Hib 1</label></div></div>
-                                <div class="col-md-4"><div class="form-check form-switch"><input class="form-check-input form-switch" type="checkbox" name="imunisasi_dpt2"><label class="form-check-label fw-bold">DPT-HB-Hib 2</label></div></div>
-                                <div class="col-md-4"><div class="form-check form-switch"><input class="form-check-input form-switch" type="checkbox" name="imunisasi_dpt3"><label class="form-check-label fw-bold">DPT-HB-Hib 3</label></div></div>
-                                <div class="col-md-4"><div class="form-check form-switch"><input class="form-check-input form-switch" type="checkbox" name="imunisasi_campak"><label class="form-check-label fw-bold">Campak / MR</label></div></div>
-                            </div>
+                            <fieldset class="border-0 p-0 m-0" aria-describedby="imunisasi-hint">
+                                <legend class="form-label fw-bold mb-2"><i class="bi bi-syringe me-2" aria-hidden="true"></i>Riwayat Imunisasi Rutin</legend>
+                                <p class="form-text" id="imunisasi-hint">Centang imunisasi yang sudah diberikan.</p>
+                                <div class="row g-2">
+                                    <div class="col-md-4"><div class="form-check form-switch"><input class="form-check-input" id="imunisasi-bcg" type="checkbox" name="imunisasi_bcg" value="1" @checked(old('imunisasi_bcg', $existingRecord?->imunisasi_bcg))><label class="form-check-label fw-bold" for="imunisasi-bcg">BCG</label></div></div>
+                                    <div class="col-md-4"><div class="form-check form-switch"><input class="form-check-input" id="imunisasi-polio1" type="checkbox" name="imunisasi_polio1" value="1" @checked(old('imunisasi_polio1', $existingRecord?->imunisasi_polio1))><label class="form-check-label fw-bold" for="imunisasi-polio1">Polio 1</label></div></div>
+                                    <div class="col-md-4"><div class="form-check form-switch"><input class="form-check-input" id="imunisasi-polio2" type="checkbox" name="imunisasi_polio2" value="1" @checked(old('imunisasi_polio2', $existingRecord?->imunisasi_polio2))><label class="form-check-label fw-bold" for="imunisasi-polio2">Polio 2</label></div></div>
+                                    <div class="col-md-4"><div class="form-check form-switch"><input class="form-check-input" id="imunisasi-polio3" type="checkbox" name="imunisasi_polio3" value="1" @checked(old('imunisasi_polio3', $existingRecord?->imunisasi_polio3))><label class="form-check-label fw-bold" for="imunisasi-polio3">Polio 3</label></div></div>
+                                    <div class="col-md-4"><div class="form-check form-switch"><input class="form-check-input" id="imunisasi-dpt1" type="checkbox" name="imunisasi_dpt1" value="1" @checked(old('imunisasi_dpt1', $existingRecord?->imunisasi_dpt1))><label class="form-check-label fw-bold" for="imunisasi-dpt1">DPT-HB-Hib 1</label></div></div>
+                                    <div class="col-md-4"><div class="form-check form-switch"><input class="form-check-input" id="imunisasi-dpt2" type="checkbox" name="imunisasi_dpt2" value="1" @checked(old('imunisasi_dpt2', $existingRecord?->imunisasi_dpt2))><label class="form-check-label fw-bold" for="imunisasi-dpt2">DPT-HB-Hib 2</label></div></div>
+                                    <div class="col-md-4"><div class="form-check form-switch"><input class="form-check-input" id="imunisasi-dpt3" type="checkbox" name="imunisasi_dpt3" value="1" @checked(old('imunisasi_dpt3', $existingRecord?->imunisasi_dpt3))><label class="form-check-label fw-bold" for="imunisasi-dpt3">DPT-HB-Hib 3</label></div></div>
+                                    <div class="col-md-4"><div class="form-check form-switch"><input class="form-check-input" id="imunisasi-campak" type="checkbox" name="imunisasi_campak" value="1" @checked(old('imunisasi_campak', $existingRecord?->imunisasi_campak))><label class="form-check-label fw-bold" for="imunisasi-campak">Campak / MR</label></div></div>
+                                </div>
+                            </fieldset>
                         </div>
                     </div>
                     <div class="card mb-4 border">
@@ -127,8 +147,8 @@
                         <div class="card-body">
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold">Pemberian Makanan Tambahan (PMT)</label>
-                                    <select name="pmt_diterima" class="form-select">
+                                    <label for="balita-pmt" class="form-label fw-bold">Pemberian Makanan Tambahan (PMT)</label>
+                                    <select id="balita-pmt" name="pmt_diterima" class="form-select">
                                         <option value="">Tidak Menerima</option>
                                         <option>PMT Pemulihan (Gizi Buruk)</option>
                                         <option>PMT Pencegahan (Risiko Stunting)</option>
@@ -138,8 +158,8 @@
                                     </select>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold">Catatan Kader / Nakes</label>
-                                    <input type="text" name="catatan" class="form-control" placeholder="Catatan rujukan, konseling, dll.">
+                                    <label for="balita-catatan" class="form-label fw-bold">Catatan Kader / Nakes</label>
+                                    <input id="balita-catatan" type="text" name="catatan" class="form-control" placeholder="Catatan rujukan, konseling, dll." value="{{ old('catatan', $existingRecord?->catatan) }}">
                                 </div>
                             </div>
                         </div>

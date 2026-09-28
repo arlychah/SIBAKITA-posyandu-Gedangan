@@ -34,36 +34,36 @@
                         <div class="card-body">
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold">NIK <span class="text-danger">*</span></label>
-                                    <input type="text" name="nik" maxlength="16" required class="form-control @error('nik') is-invalid @enderror" value="{{ old('nik', $warga->nik) }}" pattern="[0-9]{16}">
+                                    <label for="edit-warga-nik" class="form-label fw-bold">NIK <span class="text-danger">*</span></label>
+                                    <input id="edit-warga-nik" type="text" name="nik" maxlength="16" required class="form-control @error('nik') is-invalid @enderror" value="{{ old('nik', $warga->nik) }}" pattern="[0-9]{16}">
                                     @error('nik')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold">Nama Lengkap <span class="text-danger">*</span></label>
-                                    <input type="text" name="nama_lengkap" required class="form-control @error('nama_lengkap') is-invalid @enderror" value="{{ old('nama_lengkap', $warga->nama_lengkap) }}">
+                                    <label for="edit-warga-nama" class="form-label fw-bold">Nama Lengkap <span class="text-danger">*</span></label>
+                                    <input id="edit-warga-nama" type="text" name="nama_lengkap" required class="form-control @error('nama_lengkap') is-invalid @enderror" value="{{ old('nama_lengkap', $warga->nama_lengkap) }}">
                                     @error('nama_lengkap')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="form-label fw-bold">Jenis Kelamin <span class="text-danger">*</span></label>
-                                    <select name="jenis_kelamin" required class="form-select @error('jenis_kelamin') is-invalid @enderror">
+                                    <label for="edit-warga-jenis-kelamin" class="form-label fw-bold">Jenis Kelamin <span class="text-danger">*</span></label>
+                                    <select id="edit-warga-jenis-kelamin" name="jenis_kelamin" required class="form-select @error('jenis_kelamin') is-invalid @enderror">
                                         <option value="Laki-laki" @selected(old('jenis_kelamin',$warga->jenis_kelamin)=='Laki-laki')>Laki-laki</option>
                                         <option value="Perempuan" @selected(old('jenis_kelamin',$warga->jenis_kelamin)=='Perempuan')>Perempuan</option>
                                     </select>
                                     @error('jenis_kelamin')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="form-label fw-bold">Tempat Lahir</label>
-                                    <input type="text" name="tempat_lahir" class="form-control @error('tempat_lahir') is-invalid @enderror" value="{{ old('tempat_lahir', $warga->tempat_lahir) }}">
+                                    <label for="edit-warga-tempat-lahir" class="form-label fw-bold">Tempat Lahir</label>
+                                    <input id="edit-warga-tempat-lahir" type="text" name="tempat_lahir" class="form-control @error('tempat_lahir') is-invalid @enderror" value="{{ old('tempat_lahir', $warga->tempat_lahir) }}">
                                     @error('tempat_lahir')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="form-label fw-bold">Tanggal Lahir <span class="text-danger">*</span></label>
-                                    <input type="date" name="tanggal_lahir" required class="form-control @error('tanggal_lahir') is-invalid @enderror" value="{{ old('tanggal_lahir', $warga->tanggal_lahir instanceof \Carbon\Carbon ? $warga->tanggal_lahir->format('Y-m-d') : date('Y-m-d', strtotime($warga->tanggal_lahir))) }}">
+                                    <label for="edit-warga-tanggal-lahir" class="form-label fw-bold">Tanggal Lahir <span class="text-danger">*</span></label>
+                                    <input id="edit-warga-tanggal-lahir" type="date" name="tanggal_lahir" required class="form-control @error('tanggal_lahir') is-invalid @enderror" value="{{ old('tanggal_lahir', $warga->tanggal_lahir instanceof \Carbon\Carbon ? $warga->tanggal_lahir->format('Y-m-d') : date('Y-m-d', strtotime($warga->tanggal_lahir))) }}">
                                     @error('tanggal_lahir')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="form-label fw-bold">Kategori <span class="text-danger">*</span></label>
-                                    <select name="kategori" required class="form-select @error('kategori') is-invalid @enderror" id="kategoriSelect">
+                                    <label for="edit-kategoriSelect" class="form-label fw-bold">Kategori <span class="text-danger">*</span></label>
+                                    <select name="kategori" required class="form-select @error('kategori') is-invalid @enderror" id="edit-kategoriSelect">
                                         <option value="Balita" @selected(old('kategori',$warga->kategori)=='Balita')>Bayi & Balita</option>
                                         <option value="Ibu Hamil" @selected(old('kategori',$warga->kategori)=='Ibu Hamil')>Ibu Hamil & Nifas</option>
                                         <option value="Lansia" @selected(old('kategori',$warga->kategori)=='Lansia')>Lansia & PTM</option>
@@ -71,13 +71,13 @@
                                     @error('kategori')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold">Nomor WhatsApp <span class="text-danger">*</span></label>
-                                    <input type="tel" name="whatsapp" required class="form-control @error('whatsapp') is-invalid @enderror" value="{{ old('whatsapp', $warga->whatsapp) }}">
+                                    <label for="edit-warga-whatsapp" class="form-label fw-bold">Nomor WhatsApp <span class="text-danger">*</span></label>
+                                    <input id="edit-warga-whatsapp" type="tel" name="whatsapp" required class="form-control @error('whatsapp') is-invalid @enderror" value="{{ old('whatsapp', $warga->whatsapp) }}">
                                     @error('whatsapp')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                 </div>
                                 <div class="col-md-12">
-                                    <label class="form-label fw-bold">Alamat Domisili</label>
-                                    <textarea name="alamat" rows="2" class="form-control @error('alamat') is-invalid @enderror">{{ old('alamat', $warga->alamat) }}</textarea>
+                                    <label for="edit-warga-alamat" class="form-label fw-bold">Alamat Domisili</label>
+                                    <textarea id="edit-warga-alamat" name="alamat" rows="2" class="form-control @error('alamat') is-invalid @enderror">{{ old('alamat', $warga->alamat) }}</textarea>
                                     @error('alamat')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                 </div>
                             </div>
@@ -90,8 +90,8 @@
                         <div class="card-body">
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold">Puskesmas Domisili <span class="text-danger">*</span></label>
-                                    <input type="text" name="puskesmas" required class="form-control @error('puskesmas') is-invalid @enderror" list="puskesmasList" placeholder="Nama Puskesmas" value="{{ old('puskesmas', $warga->puskesmas) }}">
+                                    <label for="edit-warga-puskesmas" class="form-label fw-bold">Puskesmas Domisili <span class="text-danger">*</span></label>
+                                    <input id="edit-warga-puskesmas" type="text" name="puskesmas" required class="form-control @error('puskesmas') is-invalid @enderror" list="puskesmasList" placeholder="Nama Puskesmas" value="{{ old('puskesmas', $warga->puskesmas) }}">
                                     <datalist id="puskesmasList">
                                         <option value="Puskesmas Kecamatan A">
                                         <option value="Puskesmas Kecamatan B">
@@ -107,8 +107,8 @@
                                     <small class="text-muted d-block mt-1"><i class="bi bi-info-circle me-1"></i>Bisa mengetik nama puskesmas atau memilih dari daftar.</small>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label fw-bold">Pustu Domisili <span class="text-danger">*</span></label>
-                                    <input type="text" name="pustu" required class="form-control @error('pustu') is-invalid @enderror" value="{{ old('pustu', $warga->pustu) }}">
+                                    <label for="edit-warga-pustu" class="form-label fw-bold">Pustu Domisili <span class="text-danger">*</span></label>
+                                    <input id="edit-warga-pustu" type="text" name="pustu" required class="form-control @error('pustu') is-invalid @enderror" value="{{ old('pustu', $warga->pustu) }}">
                                     @error('pustu')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                 </div>
                             </div>
@@ -122,13 +122,13 @@
                             <div class="card-body">
                                 <div class="row g-3">
                                     <div class="col-md-6">
-                                        <label class="form-label fw-bold">Nama Ibu</label>
-                                        <input type="text" name="nama_ibu" class="form-control @error('nama_ibu') is-invalid @enderror" value="{{ old('nama_ibu', $warga->balita->nama_ibu ?? '') }}">
+                                        <label for="edit-warga-nama-ibu" class="form-label fw-bold">Nama Ibu</label>
+                                        <input id="edit-warga-nama-ibu" type="text" name="nama_ibu" class="form-control @error('nama_ibu') is-invalid @enderror" value="{{ old('nama_ibu', $warga->balita->nama_ibu ?? '') }}">
                                         @error('nama_ibu')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label fw-bold">Nama Ayah</label>
-                                        <input type="text" name="nama_ayah" class="form-control @error('nama_ayah') is-invalid @enderror" value="{{ old('nama_ayah', $warga->balita->nama_ayah ?? '') }}">
+                                        <label for="edit-warga-nama-ayah" class="form-label fw-bold">Nama Ayah</label>
+                                        <input id="edit-warga-nama-ayah" type="text" name="nama_ayah" class="form-control @error('nama_ayah') is-invalid @enderror" value="{{ old('nama_ayah', $warga->balita->nama_ayah ?? '') }}">
                                         @error('nama_ayah')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
                                 </div>
@@ -141,8 +141,8 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <label class="form-label fw-bold">Nama Suami</label>
-                                        <input type="text" name="nama_suami" class="form-control @error('nama_suami') is-invalid @enderror" value="{{ old('nama_suami', $warga->ibu_hamil->nama_suami ?? '') }}">
+                                        <label for="edit-warga-nama-suami" class="form-label fw-bold">Nama Suami</label>
+                                        <input id="edit-warga-nama-suami" type="text" name="nama_suami" class="form-control @error('nama_suami') is-invalid @enderror" value="{{ old('nama_suami', $warga->ibu_hamil->nama_suami ?? '') }}">
                                         @error('nama_suami')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
                                 </div>
@@ -166,7 +166,7 @@
 @push('extra_js')
 <script>
 (function(){
-    const sel = document.getElementById('kategoriSelect');
+    const sel = document.getElementById('edit-kategoriSelect');
     function toggleExtra(val){
         document.querySelectorAll('.balita-field').forEach(e => e.style.display = val === 'Balita' ? 'block' : 'none');
         document.querySelectorAll('.ibu-hamil-field').forEach(e => e.style.display = val === 'Ibu Hamil' ? 'block' : 'none');

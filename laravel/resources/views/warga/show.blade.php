@@ -34,14 +34,12 @@
                 <i class="bi bi-thermometer-half me-2"></i>Input Pemeriksaan Lansia
             </a>
             @endif
-            <div class="d-flex gap-2">
-                <a href="{{ url('/warga/'.$warga->id.'/edit') }}" class="btn btn-outline-secondary flex-grow-1">
-                    <i class="bi bi-pencil-square me-1"></i>Edit Data
-                </a>
-                <button class="btn btn-outline-danger" onclick="confirmDelete({{ $warga->id }})">
-                    <i class="bi bi-trash-fill"></i>
-                </button>
-            </div>
+            @if(auth()->user()->role === 'petugas')
+                <div class="d-flex gap-2">
+                    <a href="{{ route('warga.edit', $warga->id) }}" class="btn btn-outline-secondary flex-grow-1"><i class="bi bi-pencil-square me-1" aria-hidden="true"></i>Edit Data</a>
+                    <button type="button" class="btn btn-outline-danger" aria-label="Hapus data {{ $warga->nama_lengkap }}" onclick="confirmDelete({{ $warga->id }})"><i class="bi bi-trash-fill" aria-hidden="true"></i></button>
+                </div>
+            @endif
         </div>
         <div class="card">
             <div class="card-body">
@@ -152,7 +150,7 @@
                         <tbody>
                             @foreach($warga->balita->riwayat->sortByDesc('tanggal') as $p)
                             <tr>
-                                <td class="ps-4"><strong>{{ date('d-m-Y', strtotime($p->tanggal)) }}</strong></td>
+                                <td class="ps-4"><strong>{{ date('d-m-Y', strtotime($p->tanggal)) }}</strong><br><span class="badge {{ $p->verification_status === 'verified' ? 'bg-success' : ($p->verification_status === 'needs_revision' ? 'bg-warning text-dark' : 'bg-secondary') }}">{{ \\App\\Support\\VerificationStatus::labels()[$p->verification_status] ?? 'Perlu ditinjau (data lama)' }}</span></td>
                                 <td>{{ $p->berat_badan }}</td>
                                 <td>{{ $p->tinggi_badan }}</td>
                                 <td>{{ $p->lingkar_kepala ?? '-' }}</td>
@@ -214,7 +212,7 @@
                         <tbody>
                             @foreach($warga->ibu_hamil->riwayat->sortByDesc('tanggal') as $p)
                             <tr>
-                                <td class="ps-4"><strong>{{ date('d-m-Y', strtotime($p->tanggal)) }}</strong></td>
+                                <td class="ps-4"><strong>{{ date('d-m-Y', strtotime($p->tanggal)) }}</strong><br><span class="badge {{ $p->verification_status === 'verified' ? 'bg-success' : ($p->verification_status === 'needs_revision' ? 'bg-warning text-dark' : 'bg-secondary') }}">{{ \\App\\Support\\VerificationStatus::labels()[$p->verification_status] ?? 'Perlu ditinjau (data lama)' }}</span></td>
                                 <td>{{ $p->usia_kehamilan ?? '-' }} Minggu</td>
                                 <td>{{ $p->berat_badan ?? '-' }} kg</td>
                                 <td>
@@ -268,7 +266,7 @@
                         <tbody>
                             @foreach($warga->lansia->riwayat->sortByDesc('tanggal') as $p)
                             <tr>
-                                <td class="ps-4"><strong>{{ date('d-m-Y', strtotime($p->tanggal)) }}</strong></td>
+                                <td class="ps-4"><strong>{{ date('d-m-Y', strtotime($p->tanggal)) }}</strong><br><span class="badge {{ $p->verification_status === 'verified' ? 'bg-success' : ($p->verification_status === 'needs_revision' ? 'bg-warning text-dark' : 'bg-secondary') }}">{{ \\App\\Support\\VerificationStatus::labels()[$p->verification_status] ?? 'Perlu ditinjau (data lama)' }}</span></td>
                                 <td>
                                     @if($p->tekanan_darah_sistolik && $p->tekanan_darah_diastolik)
                                     <span class="@if($p->tekanan_darah_sistolik >= 140)text-danger fw-bold @endif">

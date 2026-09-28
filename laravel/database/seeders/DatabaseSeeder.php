@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             IbuHamilSeeder::class,
             LansiaSeeder::class,
             PemeriksaanSeeder::class,
+            MemberProfileLinkSeeder::class,
         ]);
     }
 }

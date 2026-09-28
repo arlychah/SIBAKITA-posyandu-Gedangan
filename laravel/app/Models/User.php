@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class User extends Authenticatable
 {
@@ -22,6 +23,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'warga_id',
     ];
 
     /**
@@ -42,4 +44,14 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function warga(): BelongsTo
+    {
+        return $this->belongsTo(Warga::class, 'warga_id');
+    }
+
+    public function hasAnyRole(string ...$roles): bool
+    {
+        return in_array($this->role, $roles, true);
+    }
 }
