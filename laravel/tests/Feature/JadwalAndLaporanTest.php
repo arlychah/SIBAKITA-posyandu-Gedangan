@@ -98,6 +98,9 @@ class JadwalAndLaporanTest extends TestCase
     {
         $this->createVerifiedReports();
         $this->assertSame(1, PemeriksaanBalita::where('verification_status', 'verified')->count());
+        $this->assertSame(1, PemeriksaanBalita::where('verification_status', 'verified')
+            ->whereBetween('tanggal', [today()->subDays(30)->toDateString(), today()->toDateString()])
+            ->count());
         $this->assertSame(1, PemeriksaanIbuHamil::where('verification_status', 'verified')->count());
         $this->assertSame(1, PemeriksaanLansia::where('verification_status', 'verified')->count());
 
