@@ -2,46 +2,58 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\User;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
-        User::create([
-            'name' => 'Administrator',
-            'email' => 'admin@sibakita.test',
-            'email_verified_at' => now(),
-            'password' => Hash::make('admin123'),
-            'role' => 'admin',
-        ]);
+        $createSampleUsers = User::count() === 0;
 
-        User::create([
-            'name' => 'Kader Posyandu Melati',
-            'email' => 'kader@sibakita.test',
-            'email_verified_at' => now(),
-            'password' => Hash::make('kader123'),
-            'role' => 'kader',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'admin@sibakita.test'],
+            [
+                'name' => 'Administrator',
+                'email_verified_at' => now(),
+                'password' => Hash::make('admin123'),
+                'role' => 'admin',
+            ]
+        );
 
-        User::create([
-            'name' => 'dr. Siti Rahmawati, Amd. Keb',
-            'email' => 'petugas@sibakita.test',
-            'email_verified_at' => now(),
-            'password' => Hash::make('puskesmas123'),
-            'role' => 'petugas',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'kader@sibakita.test'],
+            [
+                'name' => 'Kader Posyandu Melati',
+                'email_verified_at' => now(),
+                'password' => Hash::make('kader123'),
+                'role' => 'kader',
+            ]
+        );
 
-        User::create([
-            'name' => 'Budi Santoso',
-            'email' => 'warga@sibakita.test',
-            'email_verified_at' => now(),
-            'password' => Hash::make('warga123'),
-            'role' => 'warga',
-        ]);
+        User::firstOrCreate(
+            ['email' => 'petugas@sibakita.test'],
+            [
+                'name' => 'dr. Siti Rahmawati, Amd. Keb',
+                'email_verified_at' => now(),
+                'password' => Hash::make('puskesmas123'),
+                'role' => 'petugas',
+            ]
+        );
 
-        User::factory(6)->create();
+        User::firstOrCreate(
+            ['email' => 'warga@sibakita.test'],
+            [
+                'name' => 'Budi Santoso',
+                'email_verified_at' => now(),
+                'password' => Hash::make('warga123'),
+                'role' => 'warga',
+            ]
+        );
+
+        if ($createSampleUsers) {
+            User::factory(6)->create();
+        }
     }
 }

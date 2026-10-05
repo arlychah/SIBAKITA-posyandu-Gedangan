@@ -46,7 +46,7 @@
                     </div>
                 </div>
             </div>
-            <form method="POST" action="{{ $correction ? route('ibu_hamil.periksa.koreksi.update', [$ibuHamil->id, $existingRecord->id]) : route('ibu_hamil.periksa.store', $ibuHamil->id) }}">
+            <form method="POST" action="{{ $correction ? route('ibu_hamil.periksa.koreksi.update', [$ibu_hamil->id, $existingRecord->id]) : route('ibu_hamil.periksa.store', $ibu_hamil->id) }}">
                 @csrf
                 <div class="card-body">
                     @if($correction)<div class="alert alert-warning" role="status"><strong>Perlu perbaikan:</strong> {{ $existingRecord->return_reason }}</div>@endif

@@ -19,6 +19,7 @@ class JadwalController extends Controller
         }
 
         $jadwal = $query->paginate(15);
+
         return view('jadwal.index', compact('jadwal'));
     }
 
@@ -38,6 +39,8 @@ class JadwalController extends Controller
 
     public function edit(JadwalPosyandu $jadwal)
     {
+        $this->ensureScheduled($jadwal);
+
         return view('jadwal.form', [
             'jadwal' => $jadwal,
             'action' => route('jadwal.update', $jadwal),
@@ -46,16 +49,26 @@ class JadwalController extends Controller
 
     public function update(Request $request, JadwalPosyandu $jadwal)
     {
+        $this->ensureScheduled($jadwal);
         $jadwal->update($this->validated($request) + ['updated_by' => $request->user()->id]);
 
         return redirect()->route('jadwal.index')->with('success', 'Jadwal Posyandu berhasil diperbarui.');
     }
 
-    public function cancel(JadwalPosyandu $jadwal)
+    public function cancel(Request $request, JadwalPosyandu $jadwal)
     {
-        $jadwal->update(['status' => JadwalPosyandu::STATUS_DIBATALKAN, 'updated_by' => request()->user()->id]);
+        $this->ensureScheduled($jadwal);
+        $jadwal->update([
+            'status' => JadwalPosyandu::STATUS_DIBATALKAN,
+            'updated_by' => $request->user()->id,
+        ]);
 
         return redirect()->route('jadwal.index')->with('success', 'Jadwal dibatalkan. Riwayat jadwal tetap tersimpan.');
+    }
+
+    private function ensureScheduled(JadwalPosyandu $jadwal): void
+    {
+        abort_unless($jadwal->status === JadwalPosyandu::STATUS_TERJADWAL, 409, 'Jadwal yang sudah dibatalkan tidak dapat diubah.');
     }
 
     private function validated(Request $request): array
@@ -63,7 +76,7 @@ class JadwalController extends Controller
         return $request->validate([
             'judul' => ['required', 'string', 'max:160'],
             'kategori' => ['required', Rule::in(JadwalPosyandu::KATEGORI)],
-            'tanggal' => ['required', 'date'],
+            'tanggal' => ['required', 'date', 'after_or_equal:today'],
             'waktu_mulai' => ['required', 'date_format:H:i'],
             'waktu_selesai' => ['nullable', 'date_format:H:i', 'after:waktu_mulai'],
             'lokasi' => ['required', 'string', 'max:180'],

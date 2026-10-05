@@ -149,5 +149,6 @@
             </table>
         </div>
     </div>
+    <div class="card-footer bg-white">{{ $data->links() }}</div>
 </div>
 @endsection

@@ -218,7 +218,9 @@
                 <small class="text-white-50">Sistem Terintegrasi</small>
             </div>
             <div class="nav flex-column py-3">
-                @php($currentRole = Auth::user()->role)
+                @php
+                    $currentRole = Auth::user()->role;
+                @endphp
                 <a href="{{ route('dashboard') }}" class="nav-link">
                     <i class="bi bi-speedometer2"></i> Dashboard
                 </a>

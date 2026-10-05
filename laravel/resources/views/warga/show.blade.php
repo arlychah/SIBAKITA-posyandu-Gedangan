@@ -150,7 +150,7 @@
                         <tbody>
                             @foreach($warga->balita->riwayat->sortByDesc('tanggal') as $p)
                             <tr>
-                                <td class="ps-4"><strong>{{ date('d-m-Y', strtotime($p->tanggal)) }}</strong><br><span class="badge {{ $p->verification_status === 'verified' ? 'bg-success' : ($p->verification_status === 'needs_revision' ? 'bg-warning text-dark' : 'bg-secondary') }}">{{ \\App\\Support\\VerificationStatus::labels()[$p->verification_status] ?? 'Perlu ditinjau (data lama)' }}</span></td>
+                                <td class="ps-4"><strong>{{ date('d-m-Y', strtotime($p->tanggal)) }}</strong><br><span class="badge {{ $p->verification_status === 'verified' ? 'bg-success' : ($p->verification_status === 'needs_revision' ? 'bg-warning text-dark' : 'bg-secondary') }}">{{ \App\Support\VerificationStatus::labels()[$p->verification_status] ?? 'Perlu ditinjau (data lama)' }}</span></td>
                                 <td>{{ $p->berat_badan }}</td>
                                 <td>{{ $p->tinggi_badan }}</td>
                                 <td>{{ $p->lingkar_kepala ?? '-' }}</td>
@@ -212,7 +212,7 @@
                         <tbody>
                             @foreach($warga->ibu_hamil->riwayat->sortByDesc('tanggal') as $p)
                             <tr>
-                                <td class="ps-4"><strong>{{ date('d-m-Y', strtotime($p->tanggal)) }}</strong><br><span class="badge {{ $p->verification_status === 'verified' ? 'bg-success' : ($p->verification_status === 'needs_revision' ? 'bg-warning text-dark' : 'bg-secondary') }}">{{ \\App\\Support\\VerificationStatus::labels()[$p->verification_status] ?? 'Perlu ditinjau (data lama)' }}</span></td>
+                                <td class="ps-4"><strong>{{ date('d-m-Y', strtotime($p->tanggal)) }}</strong><br><span class="badge {{ $p->verification_status === 'verified' ? 'bg-success' : ($p->verification_status === 'needs_revision' ? 'bg-warning text-dark' : 'bg-secondary') }}">{{ \App\Support\VerificationStatus::labels()[$p->verification_status] ?? 'Perlu ditinjau (data lama)' }}</span></td>
                                 <td>{{ $p->usia_kehamilan ?? '-' }} Minggu</td>
                                 <td>{{ $p->berat_badan ?? '-' }} kg</td>
                                 <td>
@@ -266,7 +266,7 @@
                         <tbody>
                             @foreach($warga->lansia->riwayat->sortByDesc('tanggal') as $p)
                             <tr>
-                                <td class="ps-4"><strong>{{ date('d-m-Y', strtotime($p->tanggal)) }}</strong><br><span class="badge {{ $p->verification_status === 'verified' ? 'bg-success' : ($p->verification_status === 'needs_revision' ? 'bg-warning text-dark' : 'bg-secondary') }}">{{ \\App\\Support\\VerificationStatus::labels()[$p->verification_status] ?? 'Perlu ditinjau (data lama)' }}</span></td>
+                                <td class="ps-4"><strong>{{ date('d-m-Y', strtotime($p->tanggal)) }}</strong><br><span class="badge {{ $p->verification_status === 'verified' ? 'bg-success' : ($p->verification_status === 'needs_revision' ? 'bg-warning text-dark' : 'bg-secondary') }}">{{ \App\Support\VerificationStatus::labels()[$p->verification_status] ?? 'Perlu ditinjau (data lama)' }}</span></td>
                                 <td>
                                     @if($p->tekanan_darah_sistolik && $p->tekanan_darah_diastolik)
                                     <span class="@if($p->tekanan_darah_sistolik >= 140)text-danger fw-bold @endif">

@@ -2,35 +2,46 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Warga;
 use App\Models\Balita;
 use App\Models\IbuHamil;
 use App\Models\Lansia;
+use App\Models\PemeriksaanAuditLog;
+use App\Models\PemeriksaanBalita;
+use App\Models\PemeriksaanIbuHamil;
+use App\Models\PemeriksaanLansia;
+use App\Models\Warga;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class WargaController extends Controller
 {
-    public function index(Request $r)
-    {
-        $kategori = $r->input('kategori', '');
-        $search = $r->input('search', '');
+    private const KATEGORI = ['Balita', 'Ibu Hamil', 'Lansia'];
 
+    public function index(Request $request)
+    {
+        $filters = $request->validate([
+            'kategori' => ['nullable', 'string', Rule::in(self::KATEGORI)],
+            'search' => ['nullable', 'string', 'max:100'],
+        ]);
+        $kategori = $filters['kategori'] ?? '';
+        $search = trim($filters['search'] ?? '');
         $query = Warga::with(['balita', 'ibu_hamil', 'lansia']);
 
-        if ($kategori) {
+        if ($kategori !== '') {
             $kategoriNormal = strtolower(str_replace(' ', '_', $kategori));
             $query->whereRaw("LOWER(REPLACE(kategori, ' ', '_')) = ?", [$kategoriNormal]);
         }
 
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('nama_lengkap', 'LIKE', "%{$search}%")
+        if ($search !== '') {
+            $query->where(function ($query) use ($search) {
+                $query->where('nama_lengkap', 'LIKE', "%{$search}%")
                     ->orWhere('nik', 'LIKE', "%{$search}%");
             });
         }
 
-        $wargaList = $query->orderBy('created_at', 'desc')->paginate(20);
+        $wargaList = $query->orderByDesc('created_at')->paginate(20)->withQueryString();
 
         return view('warga.index', compact('wargaList', 'kategori', 'search'));
     }
@@ -40,185 +51,141 @@ class WargaController extends Controller
         return view('warga.create');
     }
 
-    public function store(Request $r)
+    public function store(Request $request)
     {
-        $r->validate([
-            'nik' => 'required|digits:16|unique:warga,nik',
-            'nama_lengkap' => 'required|string|max:200',
-            'jenis_kelamin' => 'required|string',
-            'tanggal_lahir' => 'required|date',
-            'kategori' => 'required|string',
-            'whatsapp' => 'required|string|max:15',
-            'puskesmas' => 'required|string|max:150',
-            'pustu' => 'required|string|max:150',
-        ]);
+        $data = $request->validate($this->rules());
 
-        DB::beginTransaction();
-        try {
-            $warga = Warga::create([
-                'nik' => trim($r->nik),
-                'nama_lengkap' => trim($r->nama_lengkap),
-                'whatsapp' => trim($r->whatsapp),
-                'puskesmas' => trim($r->puskesmas),
-                'pustu' => trim($r->pustu),
-                'jenis_kelamin' => $r->jenis_kelamin,
-                'tempat_lahir' => trim($r->tempat_lahir ?? ''),
-                'tanggal_lahir' => $r->tanggal_lahir,
-                'alamat' => trim($r->alamat ?? ''),
-                'kategori' => $r->kategori,
-            ]);
+        DB::transaction(function () use ($data) {
+            $warga = Warga::create(Arr::only($data, $this->wargaFields()));
+            $this->syncCategoryProfile($warga, $data);
+        });
 
-            if ($r->kategori == 'Balita') {
-                Balita::create([
-                    'warga_id' => $warga->id,
-                    'nama_ibu' => trim($r->nama_ibu ?? ''),
-                    'nama_ayah' => trim($r->nama_ayah ?? ''),
-                ]);
-            } elseif ($r->kategori == 'Ibu Hamil') {
-                IbuHamil::create([
-                    'warga_id' => $warga->id,
-                    'nama_suami' => trim($r->nama_suami ?? ''),
-                ]);
-            } elseif ($r->kategori == 'Lansia') {
-                Lansia::create([
-                    'warga_id' => $warga->id,
-                ]);
-            }
-
-            DB::commit();
-            return redirect('/warga')->with('success', 'Data warga berhasil ditambahkan!');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
-        }
+        return redirect()->route('warga.index')->with('success', 'Data warga berhasil ditambahkan!');
     }
 
-    public function show($id)
+    public function show(int $id)
     {
         $warga = Warga::with([
             'balita.riwayat',
             'ibu_hamil.riwayat',
-            'lansia.riwayat'
+            'lansia.riwayat',
         ])->findOrFail($id);
 
         return view('warga.show', compact('warga'));
     }
 
-    public function edit($id)
+    public function edit(int $id)
     {
         $warga = Warga::with(['balita', 'ibu_hamil', 'lansia'])->findOrFail($id);
+
         return view('warga.edit', compact('warga'));
     }
 
-    public function update(Request $r, $id)
+    public function update(Request $request, int $id)
     {
-        $r->validate([
-            'nik' => 'required|digits:16|unique:warga,nik,' . $id,
-            'nama_lengkap' => 'required|string|max:200',
-            'jenis_kelamin' => 'required|string',
-            'tanggal_lahir' => 'required|date',
-            'kategori' => 'required|string',
-            'whatsapp' => 'required|string|max:15',
-            'puskesmas' => 'required|string|max:150',
-            'pustu' => 'required|string|max:150',
-        ]);
+        $warga = Warga::with(['balita', 'ibu_hamil', 'lansia'])->findOrFail($id);
+        $data = $request->validate($this->rules($warga));
+        $newCategory = $data['kategori'];
 
-        DB::beginTransaction();
-        try {
-            $warga = Warga::findOrFail($id);
-            $oldKategori = trim($warga->kategori);
-            $newKategori = trim($r->kategori);
+        if ($newCategory !== $warga->kategori && $this->hasExaminationHistory($warga)) {
+            return back()->withErrors([
+                'kategori' => 'Kategori tidak dapat diubah karena warga sudah memiliki riwayat pemeriksaan.',
+            ])->withInput();
+        }
 
-            $mapKategori = static function ($val){
-                $v = strtolower(trim($val));
-                if (strpos($v, 'balita') !== false) return 'Balita';
-                if (strpos($v, 'ibu') !== false) return 'Ibu Hamil';
-                if (strpos($v, 'lansia') !== false) return 'Lansia';
-                return $val;
-            };
-
-            $warga->update([
-                'nik' => trim($r->nik),
-                'nama_lengkap' => trim($r->nama_lengkap),
-                'whatsapp' => trim($r->whatsapp),
-                'puskesmas' => trim($r->puskesmas),
-                'pustu' => trim($r->pustu),
-                'jenis_kelamin' => $r->jenis_kelamin,
-                'tempat_lahir' => trim($r->tempat_lahir ?? ''),
-                'tanggal_lahir' => $r->tanggal_lahir,
-                'alamat' => trim($r->alamat ?? ''),
-                'kategori' => $newKategori,
-            ]);
-
-            if ($oldKategori != $newKategori) {
-                if ($oldKategori == 'Balita' || $oldKategori == 'balita') { $warga->balita()?->delete(); }
-                elseif ($oldKategori == 'Ibu Hamil' || $oldKategori == 'ibu_hamil' || $oldKategori == 'ibu hamil') { $warga->ibu_hamil()?->delete(); }
-                elseif ($oldKategori == 'Lansia' || $oldKategori == 'lansia') { $warga->lansia()?->delete(); }
-
-                if ($newKategori == 'Balita') {
-                    Balita::updateOrCreate(
-                        ['warga_id' => $warga->id],
-                        [
-                            'nama_ibu' => trim($r->nama_ibu ?? ''),
-                            'nama_ayah' => trim($r->nama_ayah ?? ''),
-                        ]
-                    );
-                } elseif ($newKategori == 'Ibu Hamil') {
-                    IbuHamil::updateOrCreate(
-                        ['warga_id' => $warga->id],
-                        [
-                            'nama_suami' => trim($r->nama_suami ?? ''),
-                        ]
-                    );
-                } elseif ($newKategori == 'Lansia') {
-                    Lansia::firstOrCreate(['warga_id' => $warga->id]);
-                }
-            } else {
-                if ($newKategori == 'Balita') {
-                    Balita::updateOrCreate(
-                        ['warga_id' => $warga->id],
-                        [
-                            'nama_ibu' => trim($r->nama_ibu ?? ''),
-                            'nama_ayah' => trim($r->nama_ayah ?? ''),
-                        ]
-                    );
-                } elseif ($newKategori == 'Ibu Hamil') {
-                    IbuHamil::updateOrCreate(
-                        ['warga_id' => $warga->id],
-                        [
-                            'nama_suami' => trim($r->nama_suami ?? ''),
-                        ]
-                    );
-                } elseif ($newKategori == 'Lansia') {
-                    Lansia::firstOrCreate(['warga_id' => $warga->id]);
-                }
+        DB::transaction(function () use ($warga, $data, $newCategory) {
+            if ($newCategory !== $warga->kategori) {
+                $warga->balita()->delete();
+                $warga->ibu_hamil()->delete();
+                $warga->lansia()->delete();
             }
 
-            DB::commit();
-            return redirect("/warga/{$id}")->with('success', 'Data warga berhasil diperbarui!');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
+            $warga->update(Arr::only($data, $this->wargaFields()));
+            $this->syncCategoryProfile($warga, $data);
+        });
+
+        return redirect()->route('warga.show', $warga->id)->with('success', 'Data warga berhasil diperbarui!');
+    }
+
+    public function destroy(int $id)
+    {
+        $warga = Warga::with(['balita', 'ibu_hamil', 'lansia'])->findOrFail($id);
+
+        DB::transaction(function () use ($warga) {
+            $this->deleteAuditHistory($warga);
+            $warga->delete();
+        });
+
+        return redirect()->route('warga.index')->with('success', 'Data warga dan riwayat pemeriksaan berhasil dihapus.');
+    }
+
+    private function rules(?Warga $warga = null): array
+    {
+        return [
+            'nik' => ['required', 'digits:16', Rule::unique('warga', 'nik')->ignore($warga?->id)],
+            'nama_lengkap' => ['required', 'string', 'max:200'],
+            'jenis_kelamin' => ['required', Rule::in(['Laki-laki', 'Perempuan'])],
+            'tempat_lahir' => ['nullable', 'string', 'max:100'],
+            'tanggal_lahir' => ['required', 'date', 'before_or_equal:today'],
+            'kategori' => ['required', Rule::in(self::KATEGORI)],
+            'whatsapp' => ['required', 'digits_between:10,15'],
+            'puskesmas' => ['required', 'string', 'max:150'],
+            'pustu' => ['required', 'string', 'max:150'],
+            'alamat' => ['nullable', 'string', 'max:2000'],
+            'nama_ibu' => ['nullable', 'string', 'max:200'],
+            'nama_ayah' => ['nullable', 'string', 'max:200'],
+            'nama_suami' => ['nullable', 'string', 'max:200'],
+        ];
+    }
+
+    private function wargaFields(): array
+    {
+        return [
+            'nik', 'nama_lengkap', 'whatsapp', 'puskesmas', 'pustu',
+            'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir', 'alamat', 'kategori',
+        ];
+    }
+
+    private function syncCategoryProfile(Warga $warga, array $data): void
+    {
+        if ($data['kategori'] === 'Balita') {
+            $warga->balita()->updateOrCreate([], [
+                'nama_ibu' => $data['nama_ibu'] ?? '',
+                'nama_ayah' => $data['nama_ayah'] ?? '',
+            ]);
+        } elseif ($data['kategori'] === 'Ibu Hamil') {
+            $warga->ibu_hamil()->updateOrCreate([], [
+                'nama_suami' => $data['nama_suami'] ?? '',
+            ]);
+        } elseif ($data['kategori'] === 'Lansia') {
+            $warga->lansia()->firstOrCreate([]);
         }
     }
 
-    public function destroy($id)
+    private function hasExaminationHistory(Warga $warga): bool
     {
-        DB::beginTransaction();
-        try {
-            $warga = Warga::findOrFail($id);
+        return ($warga->balita && PemeriksaanBalita::where('balita_id', $warga->balita->id)->exists())
+            || ($warga->ibu_hamil && PemeriksaanIbuHamil::where('ibu_hamil_id', $warga->ibu_hamil->id)->exists())
+            || ($warga->lansia && PemeriksaanLansia::where('lansia_id', $warga->lansia->id)->exists());
+    }
 
-            Balita::where('warga_id', $id)->delete();
-            IbuHamil::where('warga_id', $id)->delete();
-            Lansia::where('warga_id', $id)->delete();
+    private function deleteAuditHistory(Warga $warga): void
+    {
+        $profiles = [
+            ['balita', $warga->balita, 'balita_id', PemeriksaanBalita::class],
+            ['ibu_hamil', $warga->ibu_hamil, 'ibu_hamil_id', PemeriksaanIbuHamil::class],
+            ['lansia', $warga->lansia, 'lansia_id', PemeriksaanLansia::class],
+        ];
 
-            $warga->delete();
+        foreach ($profiles as [$type, $profile, $foreignKey, $model]) {
+            if (!$profile) {
+                continue;
+            }
 
-            DB::commit();
-            return back()->with('success', 'Data warga berhasil dihapus!');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            $examinationIds = $model::where($foreignKey, $profile->id)->pluck('id');
+            PemeriksaanAuditLog::where('jenis_pemeriksaan', $type)
+                ->whereIn('pemeriksaan_id', $examinationIds)
+                ->delete();
         }
     }
 }
