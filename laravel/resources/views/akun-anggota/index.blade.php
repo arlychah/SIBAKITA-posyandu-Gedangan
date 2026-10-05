@@ -2,7 +2,6 @@
 @section('title', 'Akun Anggota | SIBAKITA')
 @section('page_title', 'Manajemen akun anggota')
 @section('content')
-@if(session('success'))<div class="alert alert-success" role="status">{{ session('success') }}</div>@endif
 @if($errors->any())<div class="alert alert-danger" role="alert"><strong>Periksa kembali data akun.</strong><ul class="mb-0">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
 <div class="row g-4">
     <div class="col-xl-5">

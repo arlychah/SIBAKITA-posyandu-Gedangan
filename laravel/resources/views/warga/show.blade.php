@@ -100,6 +100,22 @@
                         <span class="badge @if($warga->jenis_kelamin == 'Laki-laki')bg-primary @else bg-info @endif">{{ $warga->jenis_kelamin }}</span>
                     </div>
                 </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4 text-muted">Golongan Darah</div>
+                    <div class="col-sm-8"><strong>{{ $warga->golongan_darah ?? '-' }}</strong></div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4 text-muted">Agama</div>
+                    <div class="col-sm-8"><strong>{{ $warga->agama ?? '-' }}</strong></div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4 text-muted">Status Perkawinan</div>
+                    <div class="col-sm-8"><strong>{{ $warga->status_perkawinan ?? '-' }}</strong></div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4 text-muted">Pekerjaan</div>
+                    <div class="col-sm-8"><strong>{{ $warga->pekerjaan ?? '-' }}</strong></div>
+                </div>
                 @if($warga->kategori == 'Balita' && $warga->balita)
                 <div class="row mb-3">
                     <div class="col-sm-4 text-muted">Nama Ibu</div>

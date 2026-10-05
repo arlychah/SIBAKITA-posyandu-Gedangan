@@ -23,7 +23,8 @@ class LaporanController extends Controller
         [$start, $end] = $this->dateRange($request);
         $query = PemeriksaanBalita::with(['balita.warga'])
             ->where('verification_status', 'verified')
-            ->whereBetween('tanggal', [$start, $end]);
+            ->whereDate('tanggal', '>=', $start)
+            ->whereDate('tanggal', '<=', $end);
 
         $total = (clone $query)->count();
         $underweight = (clone $query)->where(function ($query) {
@@ -49,7 +50,8 @@ class LaporanController extends Controller
         [$start, $end] = $this->dateRange($request);
         $query = PemeriksaanIbuHamil::with(['ibu_hamil.warga'])
             ->where('verification_status', 'verified')
-            ->whereBetween('tanggal', [$start, $end]);
+            ->whereDate('tanggal', '>=', $start)
+            ->whereDate('tanggal', '<=', $end);
 
         $total = (clone $query)->count();
         $risikoKek = (clone $query)->whereNotNull('lila')->where('lila', '<', 23.5)->count();
@@ -57,9 +59,15 @@ class LaporanController extends Controller
         $ttdDiberikan = (clone $query)->where('ttd_diberikan', true)->count();
         $data = (clone $query)->orderByDesc('tanggal')->paginate(self::PAGE_SIZE)->withQueryString();
 
-        return view('laporan.ibu_hamil', compact(
-            'data', 'total', 'risikoKek', 'tdTinggi', 'ttdDiberikan', 'start', 'end'
-        ));
+        return view('laporan.ibu_hamil', [
+            'data' => $data,
+            'total' => $total,
+            'risiko_kek' => $risikoKek,
+            'td_tinggi' => $tdTinggi,
+            'ttd_diberikan' => $ttdDiberikan,
+            'start' => $start,
+            'end' => $end,
+        ]);
     }
 
     public function lansia(Request $request)
@@ -67,7 +75,8 @@ class LaporanController extends Controller
         [$start, $end] = $this->dateRange($request);
         $query = PemeriksaanLansia::with(['lansia.warga'])
             ->where('verification_status', 'verified')
-            ->whereBetween('tanggal', [$start, $end]);
+            ->whereDate('tanggal', '>=', $start)
+            ->whereDate('tanggal', '<=', $end);
 
         $total = (clone $query)->count();
         $hipertensi = (clone $query)->where(function ($query) {

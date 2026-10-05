@@ -2,6 +2,7 @@
 @section('title', 'Laporan Ibu Hamil & ANC')
 @section('page_title', 'Laporan Ibu Hamil, Nifas & Layanan ANC')
 @section('content')
+@if($errors->any())<div class="alert alert-danger" role="alert"><strong>Rentang tanggal tidak valid.</strong><ul class="mb-0">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
 <div class="card mb-4">
     <div class="card-body">
         <form method="get" action="{{ url('/laporan/ibu_hamil') }}" class="row g-3 align-items-end">

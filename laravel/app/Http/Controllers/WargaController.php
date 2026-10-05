@@ -2,9 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Balita;
-use App\Models\IbuHamil;
-use App\Models\Lansia;
 use App\Models\PemeriksaanAuditLog;
 use App\Models\PemeriksaanBalita;
 use App\Models\PemeriksaanIbuHamil;
@@ -135,6 +132,10 @@ class WargaController extends Controller
             'nama_ibu' => ['nullable', 'string', 'max:200'],
             'nama_ayah' => ['nullable', 'string', 'max:200'],
             'nama_suami' => ['nullable', 'string', 'max:200'],
+            'golongan_darah' => ['nullable', Rule::in(['A', 'B', 'AB', 'O', 'Tidak Tahu'])],
+            'agama' => ['nullable', 'string', 'max:30'],
+            'status_perkawinan' => ['nullable', 'string', 'max:30'],
+            'pekerjaan' => ['nullable', 'string', 'max:100'],
         ];
     }
 
@@ -143,6 +144,7 @@ class WargaController extends Controller
         return [
             'nik', 'nama_lengkap', 'whatsapp', 'puskesmas', 'pustu',
             'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir', 'alamat', 'kategori',
+            'golongan_darah', 'agama', 'status_perkawinan', 'pekerjaan',
         ];
     }
 

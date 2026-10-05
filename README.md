@@ -1,72 +1,121 @@
-# SIBAKITA-posyandu-Gedangan
-kelompok 5, pembuatan website bernama SIBAKITA
-Nama kelompok: 
+# SIBAKITA Posyandu Gedangan
+
+SIBAKITA adalah aplikasi web untuk membantu pengelolaan kegiatan Posyandu di wilayah Gedangan. Aplikasi ini mencatat data warga dan pemeriksaan kesehatan, mendukung proses verifikasi, serta menyediakan jadwal kegiatan dan laporan.
+
+Proyek ini dibuat oleh **Kelompok 5**:
+
 1. Marindra Puspitawati
 2. Arlichah
-3. Elok Dewi Wulan Sari 
+3. Elok Dewi Wulan Sari
 
+## Fitur
 
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+- Dashboard sesuai peran pengguna.
+- Pengelolaan data warga dalam kategori balita, ibu hamil, dan lansia.
+- Pencatatan pemeriksaan oleh kader.
+- Pemeriksaan hasil oleh petugas: menyetujui, mengembalikan untuk diperbaiki, atau membatalkan dengan alasan.
+- Riwayat tindakan pemeriksaan yang tersimpan dalam catatan audit.
+- Pengelolaan jadwal kegiatan Posyandu.
+- Laporan pemeriksaan balita, ibu hamil, dan lansia dengan penyaring tanggal.
+- Penghitungan status gizi balita berdasarkan standar WHO.
+- Pembatasan akses berdasarkan peran: admin, petugas, kader, dan warga.
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Teknologi
 
-## About Laravel
+- Laravel 9
+- PHP 8.0 atau lebih baru
+- MySQL atau MariaDB
+- Composer
+- Laravel Mix dan npm untuk kompilasi aset bila diperlukan
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Persiapan
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Pastikan PHP, Composer, dan MySQL/MariaDB sudah tersedia. Jika menggunakan Laragon, jalankan layanan MySQL sebelum menyiapkan aplikasi.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Buat basis data bernama `sibakita`, lalu buka PowerShell dari folder utama proyek dan jalankan:
 
-## Learning Laravel
+```powershell
+Set-Location .\laravel
+composer install
+Copy-Item .env.example .env
+php artisan key:generate
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Buka berkas `laravel/.env` dan sesuaikan pengaturan basis data dengan instalasi lokal. Contoh pengaturan bawaan:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```dotenv
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=sibakita
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-## Laravel Sponsors
+Jalankan migrasi dan pengisian data contoh:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+```powershell
+php artisan migrate --seed
+```
 
-### Premium Partners
+Seeder akan membuat akun demo dan data contoh untuk pengembangan. Jangan gunakan akun atau data demo di lingkungan produksi.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+## Menjalankan aplikasi
 
-## Contributing
+Dari folder utama proyek di Windows, jalankan berkas berikut:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```text
+start-server.bat
+```
 
-## Code of Conduct
+Berkas tersebut menjalankan server Laravel di `http://127.0.0.1:8000`. Sebagai alternatif, dari folder `laravel` jalankan:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```powershell
+php artisan serve --host=127.0.0.1 --port=8000
+```
 
-## Security Vulnerabilities
+Aset Bootstrap dan Bootstrap Icons dimuat dari jsDelivr, sehingga tampilan lengkap memerlukan koneksi internet. Jika melakukan perubahan pada aset JavaScript atau CSS lokal, jalankan perintah berikut dari folder `laravel`:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```powershell
+npm install
+npm run dev
+```
 
-## License
+## Akun demo
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Akun berikut dibuat oleh `UserSeeder` untuk penggunaan lokal:
+
+| Peran | Email | Kata sandi |
+|---|---|---|
+| Admin | `admin@sibakita.test` | `admin123` |
+| Petugas | `petugas@sibakita.test` | `puskesmas123` |
+| Kader | `kader@sibakita.test` | `kader123` |
+| Warga | `warga@sibakita.test` | `warga123` |
+
+Ganti kata sandi dan kredensial bawaan sebelum aplikasi digunakan di lingkungan selain pengembangan.
+
+## Pengujian
+
+Konfigurasi pengujian menggunakan SQLite dalam memori. Jalankan seluruh tes dari folder `laravel` dengan perintah:
+
+```powershell
+php artisan test
+```
+
+Tes mencakup autentikasi dan dashboard peran, CRUD warga, alur pemeriksaan dan audit, jadwal, serta laporan.
+
+## Struktur aplikasi
+
+Kode aplikasi Laravel berada di folder `laravel`. Beberapa lokasi penting:
+
+- `laravel/app/Http/Controllers` — pengendali fitur aplikasi.
+- `laravel/app/Models` — model dan relasi data.
+- `laravel/database/migrations` — perubahan struktur basis data.
+- `laravel/database/seeders` — akun dan data contoh.
+- `laravel/resources/views` — tampilan Blade.
+- `laravel/routes/web.php` — rute halaman web.
+- `laravel/tests` — tes otomatis.
+
+## Dokumentasi Laravel
+
+Dokumentasi resmi Laravel tersedia di [laravel.com/docs](https://laravel.com/docs).

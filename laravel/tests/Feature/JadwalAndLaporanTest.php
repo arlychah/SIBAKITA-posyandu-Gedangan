@@ -98,9 +98,7 @@ class JadwalAndLaporanTest extends TestCase
     {
         $this->createVerifiedReports();
         $this->assertSame(1, PemeriksaanBalita::where('verification_status', 'verified')->count());
-        $this->assertSame(1, PemeriksaanBalita::where('verification_status', 'verified')
-            ->whereBetween('tanggal', [today()->subDays(30)->toDateString(), today()->toDateString()])
-            ->count());
+        $this->assertSame(today()->toDateString(), PemeriksaanBalita::firstOrFail()->tanggal->toDateString());
         $this->assertSame(1, PemeriksaanIbuHamil::where('verification_status', 'verified')->count());
         $this->assertSame(1, PemeriksaanLansia::where('verification_status', 'verified')->count());
 
@@ -113,18 +111,26 @@ class JadwalAndLaporanTest extends TestCase
             ->assertViewHas('start', today()->subDays(30)->toDateString())
             ->assertViewHas('end', today()->toDateString())
             ->assertViewHas('total', 1)
+            ->assertViewHas('underweight', 0)
             ->assertViewHas('data', function ($data) {
-            return $data->count() === 1;
-        });
-        $balitaReport->assertSee('Nama Balita Uji');
+                return $data->count() === 1;
+            })
+            ->assertSee('Nama Balita Uji');
+
         $this->get(route('laporan.ibu-hamil'))
             ->assertOk()
-            ->assertSee('Nama Ibu Uji')
-            ->assertSee('1');
+            ->assertViewHas('total', 1)
+            ->assertViewHas('risiko_kek', 1)
+            ->assertViewHas('td_tinggi', 0)
+            ->assertViewHas('ttd_diberikan', 0)
+            ->assertSee('Nama Ibu Uji');
+
         $this->get(route('laporan.lansia'))
             ->assertOk()
-            ->assertSee('Nama Lansia Uji')
-            ->assertSee('1 Data');
+            ->assertViewHas('total', 1)
+            ->assertViewHas('hipertensi', 1)
+            ->assertViewHas('diabetes', 0)
+            ->assertSee('Nama Lansia Uji');
 
         $warga = User::factory()->create(['role' => 'warga']);
         $this->actingAs($warga)->get(route('laporan.index'))->assertForbidden();

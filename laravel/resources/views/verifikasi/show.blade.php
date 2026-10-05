@@ -2,7 +2,6 @@
 @section('title', 'Periksa hasil ' . $label . ' | SIBAKITA')
 @section('page_title', 'Periksa hasil ' . $label)
 @section('content')
-@if(session('success'))<div class="alert alert-success" role="status">{{ session('success') }}</div>@endif
 <section class="card mb-4" aria-labelledby="review-summary-heading">
     <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2"><h2 class="h5 mb-0" id="review-summary-heading">{{ $record->balita->warga->nama_lengkap ?? $record->ibu_hamil->warga->nama_lengkap ?? $record->lansia->warga->nama_lengkap ?? 'Anggota' }}</h2><span class="badge bg-secondary">{{ \App\Support\VerificationStatus::labels()[$record->verification_status] }}</span></div>
     <div class="card-body">
@@ -16,14 +15,37 @@
         @if($type === 'balita')<tr><th scope="row">Status BB/TB WHO</th><td>{{ $record->status_gizi_bbtb ?? 'Belum dihitung' }}@if($record->z_score_bbtb !== null) · z {{ number_format($record->z_score_bbtb, 2) }} ({{ $record->rujukan_bbtb }})@endif</td></tr>@endif
         </tbody></table></div>
         @if($record->return_reason)<div class="alert alert-warning mb-0"><strong>Alasan perbaikan:</strong> {{ $record->return_reason }}</div>@endif
+        @if($record->verification_status === \App\Support\VerificationStatus::CANCELLED)
+            @php
+                $cancellationLog = $auditLogs->firstWhere('aksi', 'cancelled');
+            @endphp
+            <div class="alert alert-danger mb-0 mt-3" role="status">
+                <strong>Pemeriksaan dibatalkan.</strong>
+                <span>{{ $cancellationLog->alasan ?? 'Alasan tidak tersedia.' }}</span>
+            </div>
+        @endif
     </div>
-    @if($record->verification_status !== 'verified')
+    @if($record->verification_status !== \App\Support\VerificationStatus::CANCELLED)
         <div class="card-footer bg-white d-flex flex-wrap gap-2 justify-content-end">
-            <a class="btn btn-outline-primary" href="{{ route('verifikasi.edit', [$type, $record->id]) }}"><i class="bi bi-pencil me-1" aria-hidden="true"></i>Ubah dengan alasan</a>
+            @if($record->verification_status !== 'verified')
+                <a class="btn btn-outline-primary" href="{{ route('verifikasi.edit', [$type, $record->id]) }}"><i class="bi bi-pencil me-1" aria-hidden="true"></i>Ubah dengan alasan</a>
+            @endif
             @if($record->verification_status === 'pending')
                 <form method="post" action="{{ route('verifikasi.approve', [$type, $record->id]) }}">@csrf<button class="btn btn-success" type="submit"><i class="bi bi-check2-circle me-1" aria-hidden="true"></i>Verifikasi hasil</button></form>
                 <form method="post" action="{{ route('verifikasi.return', [$type, $record->id]) }}" class="d-flex gap-2">@csrf<label class="visually-hidden" for="return-reason">Alasan perbaikan wajib diisi</label><input class="form-control" id="return-reason" name="alasan" required minlength="5" maxlength="2000" placeholder="Alasan pengembalian"><button class="btn btn-warning text-dark" type="submit">Kembalikan untuk perbaikan</button></form>
             @endif
+            <form method="post" action="{{ route('verifikasi.cancel', [$type, $record->id]) }}" class="w-100 border-top pt-3 mt-2" onsubmit="return confirm('Batalkan pemeriksaan ini? Perubahan akan dicatat dan tidak dapat dibatalkan.');">
+                @csrf
+                <label class="form-label" for="cancellation-reason">Alasan pembatalan <span class="text-danger">(wajib)</span></label>
+                <div class="d-flex flex-wrap gap-2 align-items-start">
+                    <div class="flex-grow-1">
+                        <textarea class="form-control" id="cancellation-reason" name="alasan_pembatalan" rows="2" required minlength="5" maxlength="2000" aria-describedby="cancellation-help @error('alasan_pembatalan') cancellation-error @enderror" placeholder="Jelaskan alasan pembatalan secara singkat">{{ old('alasan_pembatalan') }}</textarea>
+                        <div id="cancellation-help" class="form-text">Tindakan dan alasan akan tersimpan permanen pada riwayat audit.</div>
+                        @error('alasan_pembatalan')<div class="invalid-feedback d-block" id="cancellation-error" role="alert">{{ $message }}</div>@enderror
+                    </div>
+                    <button class="btn btn-outline-danger" type="submit"><i class="bi bi-x-circle me-1" aria-hidden="true"></i>Batalkan pemeriksaan</button>
+                </div>
+            </form>
         </div>
     @endif
 </section>
@@ -31,7 +53,15 @@
     <div class="card-header"><h2 class="h6 mb-0" id="audit-heading">Riwayat tindakan</h2></div>
     <div class="list-group list-group-flush">
         @forelse($auditLogs as $log)
-            <div class="list-group-item"><strong>{{ ucfirst($log->aksi) }}</strong> · {{ optional($log->actor)->name ?? 'Pengguna tidak tersedia' }} · <span class="text-muted">{{ $log->created_at->format('d M Y H:i') }}</span>@if($log->alasan)<p class="mb-1">{{ $log->alasan }}</p>@endif@if($log->sebelum)<details class="small"><summary>Lihat nilai sebelum perubahan</summary><pre class="mt-2 mb-0">{{ json_encode($log->sebelum, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre></details>@endif</div>
+            <div class="list-group-item">
+                <strong>{{ ucfirst($log->aksi) }}</strong> · {{ optional($log->actor)->name ?? 'Pengguna tidak tersedia' }} · <span class="text-muted">{{ $log->created_at->format('d M Y H:i') }}</span>
+                @if($log->alasan)
+                    <p class="mb-1">{{ $log->alasan }}</p>
+                @endif
+                @if($log->sebelum)
+                    <details class="small"><summary>Lihat nilai sebelum perubahan</summary><pre class="mt-2 mb-0">{{ json_encode($log->sebelum, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre></details>
+                @endif
+            </div>
         @empty<div class="list-group-item text-muted">Belum ada tindakan tercatat.</div>@endforelse
     </div>
 </section>

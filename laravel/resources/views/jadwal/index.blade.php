@@ -2,7 +2,6 @@
 @section('title', 'Jadwal Posyandu | SIBAKITA')
 @section('page_title', 'Jadwal Posyandu')
 @section('content')
-@if(session('success'))<div class="alert alert-success" role="status">{{ session('success') }}</div>@endif
 <section aria-labelledby="jadwal-heading">
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
         <div><h2 class="h5 mb-1" id="jadwal-heading">Agenda kegiatan</h2><p class="text-muted mb-0">Jadwal menurut kategori layanan Posyandu.</p></div>

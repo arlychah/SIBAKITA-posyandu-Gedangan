@@ -61,6 +61,7 @@ Route::middleware(['auth', 'role:petugas'])->group(function () {
     Route::get('/verifikasi/{type}/{id}', [VerificationController::class, 'show'])->whereNumber('id')->name('verifikasi.show');
     Route::post('/verifikasi/{type}/{id}/verifikasi', [VerificationController::class, 'approve'])->whereNumber('id')->name('verifikasi.approve');
     Route::post('/verifikasi/{type}/{id}/kembalikan', [VerificationController::class, 'returnForCorrection'])->whereNumber('id')->name('verifikasi.return');
+    Route::post('/verifikasi/{type}/{id}/batalkan', [VerificationController::class, 'cancel'])->whereNumber('id')->name('verifikasi.cancel');
     Route::get('/verifikasi/{type}/{id}/edit', [VerificationController::class, 'edit'])->whereNumber('id')->name('verifikasi.edit');
     Route::post('/verifikasi/{type}/{id}/edit', [VerificationController::class, 'update'])->whereNumber('id')->name('verifikasi.update');
 

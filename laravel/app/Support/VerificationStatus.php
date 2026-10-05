@@ -8,6 +8,7 @@ final class VerificationStatus
     public const LEGACY_REVIEW = 'legacy_review';
     public const VERIFIED = 'verified';
     public const NEEDS_REVISION = 'needs_revision';
+    public const CANCELLED = 'cancelled';
 
     public static function labels(): array
     {
@@ -16,6 +17,7 @@ final class VerificationStatus
             self::LEGACY_REVIEW => 'Perlu ditinjau (data lama)',
             self::VERIFIED => 'Terverifikasi',
             self::NEEDS_REVISION => 'Perlu perbaikan',
+            self::CANCELLED => 'Dibatalkan',
         ];
     }
 }

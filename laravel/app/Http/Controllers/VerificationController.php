@@ -6,6 +6,7 @@ use App\Models\PemeriksaanAuditLog;
 use App\Services\PemeriksaanAuditService;
 use App\Support\ExaminationRegistry;
 use App\Support\StatusGizi;
+use App\Support\VerificationStatus;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -28,7 +29,7 @@ class VerificationController extends Controller
     public function index(Request $request)
     {
         $status = $request->query('status', 'pending');
-        abort_unless(in_array($status, ['pending', 'legacy_review', 'needs_revision', 'verified'], true), 404);
+        abort_unless(in_array($status, ['pending', 'legacy_review', 'needs_revision', 'verified', VerificationStatus::CANCELLED], true), 404);
         $type = $request->query('jenis');
         abort_if($type && !in_array($type, ExaminationRegistry::types(), true), 404);
 
@@ -119,9 +120,35 @@ class VerificationController extends Controller
         return redirect()->route('verifikasi.show', [$type, $id])->with('success', 'Hasil dikembalikan kepada kader untuk perbaikan.');
     }
 
+    public function cancel(Request $request, string $type, int $id, PemeriksaanAuditService $audit)
+    {
+        $data = $request->validate([
+            'alasan_pembatalan' => ['required', 'string', 'min:5', 'max:2000'],
+        ]);
+        abort_unless(in_array($type, ExaminationRegistry::types(), true), 404);
+
+        DB::transaction(function () use ($id, $audit, $type, $data) {
+            $model = ExaminationRegistry::model($type);
+            $record = $model::query()->lockForUpdate()->findOrFail($id);
+            abort_if($record->verification_status === VerificationStatus::CANCELLED, 409, 'Pemeriksaan ini sudah dibatalkan.');
+
+            $before = $audit->snapshot($record);
+            $record->update([
+                'verification_status' => VerificationStatus::CANCELLED,
+                'verified_by' => null,
+                'verified_at' => null,
+                'return_reason' => null,
+            ]);
+            $audit->record($type, $record, request()->user()->id, 'cancelled', $before, $data['alasan_pembatalan']);
+        });
+
+        return redirect()->route('verifikasi.show', [$type, $id])->with('success', 'Pemeriksaan dibatalkan. Alasan dan perubahan tersimpan di riwayat audit.');
+    }
+
     public function edit(string $type, int $id)
     {
         $record = $this->findRecord($type, $id, true);
+        abort_if(in_array($record->verification_status, [VerificationStatus::VERIFIED, VerificationStatus::CANCELLED], true), 409, 'Hasil yang telah disahkan atau dibatalkan tidak dapat diubah.');
 
         return view('verifikasi.edit', [
             'record' => $record,
@@ -133,6 +160,7 @@ class VerificationController extends Controller
     public function update(Request $request, string $type, int $id, PemeriksaanAuditService $audit)
     {
         $record = $this->findRecord($type, $id);
+        abort_if(in_array($record->verification_status, [VerificationStatus::VERIFIED, VerificationStatus::CANCELLED], true), 409, 'Hasil yang telah disahkan atau dibatalkan tidak dapat diubah.');
         $validated = $request->validate($this->editRules($type));
         $reason = $validated['alasan_edit'];
         unset($validated['alasan_edit']);

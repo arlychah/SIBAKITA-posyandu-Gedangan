@@ -80,6 +80,31 @@
                                     <textarea id="edit-warga-alamat" name="alamat" rows="2" class="form-control @error('alamat') is-invalid @enderror">{{ old('alamat', $warga->alamat) }}</textarea>
                                     @error('alamat')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                 </div>
+                                <div class="col-md-3">
+                                    <label for="edit-warga-golongan-darah" class="form-label fw-bold">Golongan Darah</label>
+                                    <select id="edit-warga-golongan-darah" name="golongan_darah" class="form-select @error('golongan_darah') is-invalid @enderror">
+                                        <option value="">-- Belum diketahui --</option>
+                                        @foreach(['A', 'B', 'AB', 'O', 'Tidak Tahu'] as $golonganDarah)
+                                            <option value="{{ $golonganDarah }}" @selected(old('golongan_darah', $warga->golongan_darah) === $golonganDarah)>{{ $golonganDarah }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('golongan_darah')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="edit-warga-agama" class="form-label fw-bold">Agama</label>
+                                    <input id="edit-warga-agama" type="text" name="agama" maxlength="30" class="form-control @error('agama') is-invalid @enderror" value="{{ old('agama', $warga->agama) }}">
+                                    @error('agama')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="edit-warga-status-perkawinan" class="form-label fw-bold">Status Perkawinan</label>
+                                    <input id="edit-warga-status-perkawinan" type="text" name="status_perkawinan" maxlength="30" class="form-control @error('status_perkawinan') is-invalid @enderror" value="{{ old('status_perkawinan', $warga->status_perkawinan) }}">
+                                    @error('status_perkawinan')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="edit-warga-pekerjaan" class="form-label fw-bold">Pekerjaan</label>
+                                    <input id="edit-warga-pekerjaan" type="text" name="pekerjaan" maxlength="100" class="form-control @error('pekerjaan') is-invalid @enderror" value="{{ old('pekerjaan', $warga->pekerjaan) }}">
+                                    @error('pekerjaan')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                </div>
                             </div>
                         </div>
                     </div>

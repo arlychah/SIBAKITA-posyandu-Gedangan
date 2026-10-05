@@ -25,7 +25,18 @@ class WargaCrudTest extends TestCase
 
     public function test_petugas_can_create_and_view_warga_with_category_profile(): void
     {
-        $payload = $this->wargaPayload(['kategori' => 'Balita']);
+        $this->actingAs($this->petugas)
+            ->get(route('warga.create'))
+            ->assertOk()
+            ->assertSee('Golongan Darah');
+
+        $payload = $this->wargaPayload([
+            'kategori' => 'Balita',
+            'golongan_darah' => 'O',
+            'agama' => 'Islam',
+            'status_perkawinan' => 'Belum Kawin',
+            'pekerjaan' => 'Pelajar',
+        ]);
 
         $this->actingAs($this->petugas)
             ->post(route('warga.store'), $payload)
@@ -34,13 +45,47 @@ class WargaCrudTest extends TestCase
         $warga = Warga::where('nik', $payload['nik'])->firstOrFail();
         $this->assertDatabaseHas('balita', ['warga_id' => $warga->id]);
         $this->assertDatabaseMissing('ibu_hamil', ['warga_id' => $warga->id]);
+        $this->assertDatabaseHas('warga', [
+            'id' => $warga->id,
+            'golongan_darah' => 'O',
+            'agama' => 'Islam',
+            'status_perkawinan' => 'Belum Kawin',
+            'pekerjaan' => 'Pelajar',
+        ]);
 
         $this->get(route('warga.index', ['search' => $payload['nama_lengkap']]))
             ->assertOk()
             ->assertSee($payload['nama_lengkap']);
         $this->get(route('warga.show', $warga->id))
             ->assertOk()
-            ->assertSee($payload['nik']);
+            ->assertSee($payload['nik'])
+            ->assertSee('Golongan Darah')
+            ->assertSee('Islam')
+            ->assertSee('Belum Kawin')
+            ->assertSee('Pelajar');
+    }
+
+    public function test_petugas_can_create_warga_for_all_category_profiles(): void
+    {
+        $categories = [
+            ['kategori' => 'Ibu Hamil', 'jenis_kelamin' => 'Perempuan', 'tanggal_lahir' => '1990-04-12', 'nama_suami' => 'Suami Uji', 'profile_table' => 'ibu_hamil'],
+            ['kategori' => 'Lansia', 'jenis_kelamin' => 'Laki-laki', 'tanggal_lahir' => '1950-04-12', 'profile_table' => 'lansia'],
+        ];
+
+        foreach ($categories as $index => $attributes) {
+            $table = $attributes['profile_table'];
+            unset($attributes['profile_table']);
+            $payload = $this->wargaPayload(array_merge([
+                'nik' => sprintf('12345678901234%02d', $index + 10),
+            ], $attributes));
+
+            $this->actingAs($this->petugas)
+                ->post(route('warga.store'), $payload)
+                ->assertRedirect(route('warga.index'));
+
+            $warga = Warga::where('nik', $payload['nik'])->firstOrFail();
+            $this->assertDatabaseHas($table, ['warga_id' => $warga->id]);
+        }
     }
 
     public function test_petugas_can_update_warga_without_losing_same_category_profile(): void
@@ -52,13 +97,20 @@ class WargaCrudTest extends TestCase
             'kategori' => 'Balita',
             'nama_ibu' => 'Ibu Baru',
             'nama_ayah' => 'Ayah Baru',
+            'golongan_darah' => 'AB',
+            'pekerjaan' => 'Siswa',
         ]);
 
         $this->actingAs($this->petugas)
             ->post(route('warga.update', $warga->id), $payload)
             ->assertRedirect(route('warga.show', $warga->id));
 
-        $this->assertDatabaseHas('warga', ['id' => $warga->id, 'nama_lengkap' => $payload['nama_lengkap']]);
+        $this->assertDatabaseHas('warga', [
+            'id' => $warga->id,
+            'nama_lengkap' => $payload['nama_lengkap'],
+            'golongan_darah' => 'AB',
+            'pekerjaan' => 'Siswa',
+        ]);
         $this->assertDatabaseHas('balita', [
             'id' => $balita->id,
             'nama_ibu' => 'Ibu Baru',

@@ -77,6 +77,27 @@
                                     <label for="warga-alamat" class="form-label fw-bold">Alamat Domisili</label>
                                     <textarea id="warga-alamat" name="alamat" rows="2" class="form-control" placeholder="RT/RW, Dusun, Desa/Kelurahan">{{ old('alamat') }}</textarea>
                                 </div>
+                                <div class="col-md-3">
+                                    <label for="warga-golongan-darah" class="form-label fw-bold">Golongan Darah</label>
+                                    <select id="warga-golongan-darah" name="golongan_darah" class="form-select">
+                                        <option value="">-- Belum diketahui --</option>
+                                        @foreach(['A', 'B', 'AB', 'O', 'Tidak Tahu'] as $golonganDarah)
+                                            <option value="{{ $golonganDarah }}" @selected(old('golongan_darah') === $golonganDarah)>{{ $golonganDarah }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="warga-agama" class="form-label fw-bold">Agama</label>
+                                    <input id="warga-agama" type="text" name="agama" maxlength="30" class="form-control" value="{{ old('agama') }}">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="warga-status-perkawinan" class="form-label fw-bold">Status Perkawinan</label>
+                                    <input id="warga-status-perkawinan" type="text" name="status_perkawinan" maxlength="30" class="form-control" value="{{ old('status_perkawinan') }}">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="warga-pekerjaan" class="form-label fw-bold">Pekerjaan</label>
+                                    <input id="warga-pekerjaan" type="text" name="pekerjaan" maxlength="100" class="form-control" value="{{ old('pekerjaan') }}">
+                                </div>
                             </div>
                         </div>
                     </div>
