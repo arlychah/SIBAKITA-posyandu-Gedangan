@@ -255,6 +255,12 @@
                 @endif
 
                 @if($currentRole === 'kader')
+                    <a href="{{ route('jadwal.index') }}" class="nav-link">
+                        <i class="bi bi-calendar-event"></i> Atur Jadwal Posyandu
+                    </a>
+                @endif
+
+                @if($currentRole === 'kader')
                     <h6 class="sidebar-heading text-white-50 px-4 mt-4 mb-2" style="font-size: 0.75rem; letter-spacing: 1px;">INPUT PEMERIKSAAN</h6>
                     <a href="{{ route('dashboard.kader') }}?kategori=balita" class="nav-link"><i class="bi bi-baby"></i> Balita</a>
                     <a href="{{ route('dashboard.kader') }}?kategori=ibu_hamil" class="nav-link"><i class="bi bi-person-pregnant"></i> Ibu hamil</a>

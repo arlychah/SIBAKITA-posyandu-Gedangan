@@ -19,9 +19,10 @@ class PetugasDashboardController extends Controller
             + PemeriksaanIbuHamil::where('verification_status', 'needs_revision')->count()
             + PemeriksaanLansia::where('verification_status', 'needs_revision')->count();
 
-        $jadwalMendatang = JadwalPosyandu::scheduled()->whereDate('tanggal', '>=', today())
+        $jadwalMendatang = JadwalPosyandu::scheduled()->approved()->whereDate('tanggal', '>=', today())
             ->orderBy('tanggal')->orderBy('waktu_mulai')->limit(5)->get();
+        $jadwalMenungguPersetujuan = JadwalPosyandu::where('approval_status', JadwalPosyandu::APPROVAL_PENDING)->count();
 
-        return view('dashboard.petugas', compact('menungguVerifikasi', 'perluPerbaikan', 'jadwalMendatang'));
+        return view('dashboard.petugas', compact('menungguVerifikasi', 'perluPerbaikan', 'jadwalMendatang', 'jadwalMenungguPersetujuan'));
     }
 }

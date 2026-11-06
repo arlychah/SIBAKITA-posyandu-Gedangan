@@ -14,6 +14,9 @@ class JadwalPosyandu extends Model
     public const KATEGORI = ['balita', 'ibu_hamil', 'lansia', 'semua'];
     public const STATUS_TERJADWAL = 'scheduled';
     public const STATUS_DIBATALKAN = 'cancelled';
+    public const APPROVAL_PENDING = 'pending';
+    public const APPROVAL_NEEDS_REVISION = 'needs_revision';
+    public const APPROVAL_APPROVED = 'approved';
 
     protected $table = 'jadwal_posyandu';
 
@@ -26,12 +29,17 @@ class JadwalPosyandu extends Model
         'lokasi',
         'keterangan',
         'status',
+        'approval_status',
+        'review_note',
         'created_by',
         'updated_by',
+        'reviewed_by',
+        'reviewed_at',
     ];
 
     protected $casts = [
         'tanggal' => 'date',
+        'reviewed_at' => 'datetime',
     ];
 
     public function creator(): BelongsTo
@@ -44,9 +52,19 @@ class JadwalPosyandu extends Model
         return $this->belongsTo(User::class, 'updated_by');
     }
 
+    public function reviewer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'reviewed_by');
+    }
+
     public function scopeScheduled(Builder $query): Builder
     {
         return $query->where('status', self::STATUS_TERJADWAL);
+    }
+
+    public function scopeApproved(Builder $query): Builder
+    {
+        return $query->where('approval_status', self::APPROVAL_APPROVED);
     }
 
     public function scopeForMemberCategory(Builder $query, ?string $category): Builder

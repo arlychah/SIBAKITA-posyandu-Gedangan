@@ -65,11 +65,16 @@ Route::middleware(['auth', 'role:petugas'])->group(function () {
     Route::get('/verifikasi/{type}/{id}/edit', [VerificationController::class, 'edit'])->whereNumber('id')->name('verifikasi.edit');
     Route::post('/verifikasi/{type}/{id}/edit', [VerificationController::class, 'update'])->whereNumber('id')->name('verifikasi.update');
 
+    Route::post('/jadwal-posyandu/{jadwal}/batal', [JadwalController::class, 'cancel'])->name('jadwal.cancel');
+    Route::post('/jadwal-posyandu/{jadwal}/setujui', [JadwalController::class, 'approve'])->name('jadwal.approve');
+    Route::post('/jadwal-posyandu/{jadwal}/revisi', [JadwalController::class, 'requestRevision'])->name('jadwal.revision');
+});
+
+Route::middleware(['auth', 'role:kader,petugas'])->group(function () {
     Route::post('/jadwal-posyandu', [JadwalController::class, 'store'])->name('jadwal.store');
     Route::get('/jadwal-posyandu/tambah', [JadwalController::class, 'create'])->name('jadwal.create');
     Route::get('/jadwal-posyandu/{jadwal}/edit', [JadwalController::class, 'edit'])->name('jadwal.edit');
     Route::post('/jadwal-posyandu/{jadwal}/edit', [JadwalController::class, 'update'])->name('jadwal.update');
-    Route::post('/jadwal-posyandu/{jadwal}/batal', [JadwalController::class, 'cancel'])->name('jadwal.cancel');
 });
 
 Route::middleware(['auth', 'role:petugas,admin'])->group(function () {
@@ -78,7 +83,7 @@ Route::middleware(['auth', 'role:petugas,admin'])->group(function () {
     Route::post('/akun-anggota/{user}/tautkan', [MemberAccountController::class, 'link'])->whereNumber('user')->name('akun-anggota.link');
 });
 
-Route::middleware(['auth', 'role:warga,petugas'])->group(function () {
+Route::middleware(['auth', 'role:warga,kader,petugas'])->group(function () {
     Route::get('/jadwal-posyandu', [JadwalController::class, 'index'])->name('jadwal.index');
 });
 

@@ -94,6 +94,85 @@ class JadwalAndLaporanTest extends TestCase
         $this->assertDatabaseCount('jadwal_posyandu', 0);
     }
 
+    public function test_kader_schedule_is_hidden_until_petugas_approves_it(): void
+    {
+        $kader = User::factory()->create(['role' => 'kader']);
+        $profile = Warga::factory()->balita()->create();
+        $warga = User::factory()->create(['role' => 'warga', 'warga_id' => $profile->id]);
+
+        $this->actingAs($kader)
+            ->post(route('jadwal.store'), $this->jadwalPayload())
+            ->assertRedirect(route('jadwal.index'))
+            ->assertSessionHas('success', 'Pengajuan jadwal berhasil dikirim ke petugas untuk ditinjau.');
+
+        $jadwal = JadwalPosyandu::firstOrFail();
+        $this->assertSame('pending', $jadwal->approval_status);
+        $this->assertSame($kader->id, (int) $jadwal->created_by);
+        $this->actingAs($warga)->get(route('jadwal.index'))->assertDontSee($jadwal->judul);
+
+        $this->actingAs($this->petugas)
+            ->get(route('jadwal.index'))
+            ->assertOk()
+            ->assertSee($jadwal->judul)
+            ->assertSee('Menunggu persetujuan');
+
+        $this->post(route('jadwal.approve', $jadwal))->assertRedirect(route('jadwal.index'));
+        $this->assertDatabaseHas('jadwal_posyandu', [
+            'id' => $jadwal->id,
+            'approval_status' => 'approved',
+            'reviewed_by' => $this->petugas->id,
+        ]);
+        $this->actingAs($warga)->get(route('jadwal.index'))->assertSee($jadwal->judul);
+        $this->actingAs($kader)->get(route('jadwal.index'))->assertSee('Disetujui');
+    }
+
+    public function test_petugas_can_return_kader_schedule_for_revision_and_kader_can_resubmit_it(): void
+    {
+        $kader = User::factory()->create(['role' => 'kader']);
+        $jadwal = $this->createJadwal([
+            'created_by' => $kader->id,
+            'approval_status' => 'pending',
+        ]);
+
+        $this->actingAs($this->petugas)
+            ->post(route('jadwal.revision', $jadwal), ['review_note' => 'Mohon sesuaikan lokasi kegiatan.'])
+            ->assertRedirect(route('jadwal.index'));
+        $this->assertDatabaseHas('jadwal_posyandu', [
+            'id' => $jadwal->id,
+            'approval_status' => 'needs_revision',
+            'review_note' => 'Mohon sesuaikan lokasi kegiatan.',
+        ]);
+
+        $this->actingAs($kader)
+            ->get(route('jadwal.index'))
+            ->assertOk()
+            ->assertSee('Mohon sesuaikan lokasi kegiatan.')
+            ->assertSee('Perbaiki dan kirim ulang');
+        $this->get(route('jadwal.edit', $jadwal))->assertOk();
+        $this->post(route('jadwal.update', $jadwal), $this->jadwalPayload(['judul' => 'Posyandu Lokasi Baru']))
+            ->assertRedirect(route('jadwal.index'));
+        $this->assertDatabaseHas('jadwal_posyandu', [
+            'id' => $jadwal->id,
+            'judul' => 'Posyandu Lokasi Baru',
+            'approval_status' => 'pending',
+            'review_note' => null,
+        ]);
+    }
+
+    public function test_kader_cannot_edit_or_review_another_kaders_jadwal(): void
+    {
+        $owner = User::factory()->create(['role' => 'kader']);
+        $otherKader = User::factory()->create(['role' => 'kader']);
+        $jadwal = $this->createJadwal([
+            'created_by' => $owner->id,
+            'approval_status' => 'needs_revision',
+        ]);
+
+        $this->actingAs($otherKader)->get(route('jadwal.edit', $jadwal))->assertForbidden();
+        $this->post(route('jadwal.update', $jadwal), $this->jadwalPayload())->assertForbidden();
+        $this->actingAs($owner)->post(route('jadwal.approve', $jadwal))->assertForbidden();
+    }
+
     public function test_reports_are_limited_to_verified_records_and_petugas_only(): void
     {
         $this->createVerifiedReports();

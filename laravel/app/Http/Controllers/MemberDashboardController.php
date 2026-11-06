@@ -22,7 +22,7 @@ class MemberDashboardController extends Controller
         }
 
         $kategori = $warga->kategoriJadwal();
-        $jadwalBerikutnya = JadwalPosyandu::scheduled()
+        $jadwalBerikutnya = JadwalPosyandu::scheduled()->approved()
             ->forMemberCategory($kategori)
             ->whereDate('tanggal', '>=', today())
             ->orderBy('tanggal')
