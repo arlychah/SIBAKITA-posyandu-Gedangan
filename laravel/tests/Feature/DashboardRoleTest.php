@@ -40,6 +40,25 @@ class DashboardRoleTest extends TestCase
         ])->count());
     }
 
+    public function test_demo_admin_can_log_in_after_seeder_repairs_an_existing_account(): void
+    {
+        User::factory()->create([
+            'name' => 'Administrator',
+            'email' => 'admin@sibakita.test',
+            'password' => Hash::make('old-password'),
+            'role' => 'admin',
+        ]);
+
+        $this->seed(UserSeeder::class);
+
+        $this->post('/login', [
+            'email' => 'admin@sibakita.test',
+            'password' => 'admin123',
+        ])->assertRedirect('/');
+
+        $this->get('/')->assertOk()->assertSee('Ringkasan sistem');
+    }
+
     private function assertRoleCanOpenDashboard(string $role, string $email, string $dashboardRoute): void
     {
         $password = 'test-password';

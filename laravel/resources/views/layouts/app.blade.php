@@ -299,12 +299,6 @@
                             </div>
                         </div>
                     </div>
-                    <form method="POST" action="{{ route('logout') }}" class="d-grid">
-                        @csrf
-                        <button type="submit" class="btn btn-sm text-white fw-semibold py-2" style="background: rgba(239, 68, 68, 0.85); border-radius: 10px; transition: all 0.2s;" onmouseover="this.style.background='rgba(220,38,38,0.95)'" onmouseout="this.style.background='rgba(239,68,68,0.85)'">
-                            <i class="bi bi-box-arrow-right me-1"></i> Keluar
-                        </button>
-                    </form>
                 </div>
                 <div class="mx-3 mt-3 mb-4 p-3 rounded-3" style="background-color: rgba(255,255,255,0.08);">
                     <small class="text-white-50 d-block mb-1"><i class="bi bi-info-circle"></i> Kompatibel dengan:</small>
@@ -324,7 +318,7 @@
                         </h4>
                     </div>
                 </div>
-                <div class="page-header__profile d-flex align-items-center">
+                <div class="page-header__profile d-flex align-items-center gap-2">
                     <span class="text-muted me-3 small d-none d-md-inline">
                         <i class="bi bi-calendar-event-fill"></i>
                         @php
@@ -334,6 +328,12 @@
                             echo $tgl;
                         @endphp
                     </span>
+                    <form method="POST" action="{{ route('logout') }}" class="m-0">
+                        @csrf
+                        <button type="submit" class="btn btn-outline-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 42px; height: 42px;" aria-label="Keluar dari sistem" title="Keluar dari sistem">
+                            <i class="bi bi-box-arrow-right fs-5" aria-hidden="true"></i>
+                        </button>
+                    </form>
                     <div class="dropdown">
                         <button class="btn border-0 p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 42px; height: 42px;">
@@ -363,15 +363,6 @@
                                         echo $roleBadge[$role] ?? ucfirst($role);
                                     @endphp
                                 </span>
-                            </li>
-                            <li><hr class="dropdown-divider mx-3 my-1"></li>
-                            <li>
-                                <form method="POST" action="{{ route('logout') }}" class="px-3 py-2">
-                                    @csrf
-                                    <button type="submit" class="dropdown-item text-danger rounded-2 px-3 py-2">
-                                        <i class="bi bi-box-arrow-right me-2"></i> Keluar dari Sistem
-                                    </button>
-                                </form>
                             </li>
                         </ul>
                     </div>

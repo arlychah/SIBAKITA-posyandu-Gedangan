@@ -12,7 +12,7 @@ class UserSeeder extends Seeder
     {
         $createSampleUsers = User::count() === 0;
 
-        User::firstOrCreate(
+        User::updateOrCreate(
             ['email' => 'admin@sibakita.test'],
             [
                 'name' => 'Administrator',
@@ -22,7 +22,7 @@ class UserSeeder extends Seeder
             ]
         );
 
-        User::firstOrCreate(
+        User::updateOrCreate(
             ['email' => 'kader@sibakita.test'],
             [
                 'name' => 'Kader Posyandu Melati',
@@ -32,7 +32,7 @@ class UserSeeder extends Seeder
             ]
         );
 
-        User::firstOrCreate(
+        User::updateOrCreate(
             ['email' => 'petugas@sibakita.test'],
             [
                 'name' => 'dr. Siti Rahmawati, Amd. Keb',
@@ -42,7 +42,7 @@ class UserSeeder extends Seeder
             ]
         );
 
-        User::firstOrCreate(
+        User::updateOrCreate(
             ['email' => 'warga@sibakita.test'],
             [
                 'name' => 'Budi Santoso',
